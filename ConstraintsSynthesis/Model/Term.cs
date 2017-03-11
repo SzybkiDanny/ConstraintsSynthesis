@@ -4,19 +4,20 @@ using System.Linq;
 
 namespace ConstraintsSynthesis.Model
 {
-    internal abstract class Term
+    internal class Term
     {
         private readonly SortedDictionary<int, double> _variables =
             new SortedDictionary<int, double>();
 
         public double this[int index]
         {
-            get { return _variables[index]; }
+            get { return _variables.ContainsKey(index) ? _variables[index] : 0; }
             set { _variables[index] = value; }
         }
 
         public double Value(Point point) =>
-            _variables.Aggregate(1.0, (current, entry) => current*Math.Pow(point[entry.Key], entry.Value));
+            _variables.Aggregate(1.0,
+                (current, entry) => current*Math.Pow(point[entry.Key], entry.Value));
 
         public override string ToString() =>
             string.Join(" ", _variables.Select(entry => $"x{entry.Key}^{entry.Value}"));

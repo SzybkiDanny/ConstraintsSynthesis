@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestDataGenerator", "TestDa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestDataGeneratorTests", "TestDataGeneratorTests\TestDataGeneratorTests.csproj", "{B18EDC31-8F28-4C06-9B0E-C792BC4EB681}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConstraintsSynthesisTests", "ConstraintsSynthesisTests\ConstraintsSynthesisTests.csproj", "{5201F0DE-0735-46BA-94A4-D60D0933F460}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{B18EDC31-8F28-4C06-9B0E-C792BC4EB681}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B18EDC31-8F28-4C06-9B0E-C792BC4EB681}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B18EDC31-8F28-4C06-9B0E-C792BC4EB681}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5201F0DE-0735-46BA-94A4-D60D0933F460}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5201F0DE-0735-46BA-94A4-D60D0933F460}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5201F0DE-0735-46BA-94A4-D60D0933F460}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5201F0DE-0735-46BA-94A4-D60D0933F460}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
