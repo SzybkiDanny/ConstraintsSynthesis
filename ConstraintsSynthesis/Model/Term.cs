@@ -4,10 +4,18 @@ using System.Linq;
 
 namespace ConstraintsSynthesis.Model
 {
-    internal class Term
+    public class Term
     {
-        private readonly SortedDictionary<int, double> _variables =
-            new SortedDictionary<int, double>();
+        private readonly SortedDictionary<int, double> _variables;
+
+        public Term() : this(null)
+        {
+        }
+
+        public Term(Dictionary<int, double> variables)
+        {
+            _variables = new SortedDictionary<int, double>(variables ?? new Dictionary<int, double>());
+        }
 
         public double this[int index]
         {
@@ -16,11 +24,11 @@ namespace ConstraintsSynthesis.Model
         }
 
         public double Value(Point point) =>
-            _variables.Aggregate(1.0,
+            _variables.Aggregate(_variables.Count >0 ? 1.0 : 0.0,
                 (current, entry) => current*Math.Pow(point[entry.Key], entry.Value));
 
         public override string ToString() =>
-            string.Join(" ", _variables.Select(entry => $"x{entry.Key}^{entry.Value}"));
+            string.Join(" ", _variables.Where(entry => Math.Abs(entry.Value) > double.Epsilon).Select(entry => $"x{entry.Key}^{entry.Value}"));
 
         public override bool Equals(object obj) =>
             Equals(obj as Term);

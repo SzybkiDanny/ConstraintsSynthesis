@@ -1,6 +1,6 @@
 ﻿namespace ConstraintsSynthesis.Model
 {
-    internal class Point
+    public class Point
     {
         public bool Label { get; set; } = true;
         public double[] Coordinates { get; }

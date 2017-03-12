@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -9,14 +10,13 @@ namespace ConstraintsSynthesis.Model
 
         public double AbsoluteTerm { get; set; } = 1;
 
-
         public void ChangeInequalityDirection()
         {
             AbsoluteTerm *= -1;
 
-            foreach (var term in Terms.Keys)
+            foreach (var term in Terms.ToList())
             {
-                Terms[term] *= -1;
+                Terms[term.Key] *= -1;
             }
         }
 
@@ -49,7 +49,7 @@ namespace ConstraintsSynthesis.Model
 
         public override string ToString()
         {
-            return string.Join(" + ", Terms.Select(t => $"{t.Value} * {t.Key}"));
+            return string.Join(" + ", Terms.Where(t => Math.Abs(t.Value) > double.Epsilon).Select(t => $"{t.Value} * {t.Key}"));
         }
     }
 }
