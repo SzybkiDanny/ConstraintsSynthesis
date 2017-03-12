@@ -39,7 +39,7 @@ namespace ConstraintsSynthesis.Model
             if (GetHashCode() != constraint.GetHashCode())
                 return false;
 
-            return Terms.Equals(constraint.Terms);
+            return Terms.Equals(constraint.Terms) && AbsoluteTerm == constraint.AbsoluteTerm;
         }
 
         public override int GetHashCode()
