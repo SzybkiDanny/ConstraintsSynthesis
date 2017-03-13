@@ -7,10 +7,14 @@ namespace ConstraintsSynthesis.Model
     internal class Constraint
     {
         public Dictionary<Term, double> Terms { get; } = new Dictionary<Term, double>();
-
         public double AbsoluteTerm { get; set; } = 1;
-
         public Inequality Sign { get; set; } = Inequality.LessThanOrEqual;
+
+        public double this[Term index]
+        {
+            get { return Terms.ContainsKey(index) ? Terms[index] : 0; }
+            set { Terms[index] = value; }
+        }
 
         public bool IsSatisfying(Point point) =>
             Terms.Sum(entry => entry.Key.Value(point) * entry.Value) <= AbsoluteTerm;
