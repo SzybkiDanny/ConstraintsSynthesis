@@ -4,24 +4,16 @@ using System.Linq;
 
 namespace ConstraintsSynthesis.Model
 {
-    class Constraint
+    internal class Constraint
     {
         public Dictionary<Term, double> Terms { get; } = new Dictionary<Term, double>();
 
         public double AbsoluteTerm { get; set; } = 1;
 
-        public void ChangeInequalityDirection()
-        {
-            AbsoluteTerm *= -1;
-
-            foreach (var term in Terms.ToList())
-            {
-                Terms[term.Key] *= -1;
-            }
-        }
+        public Inequality Sign { get; set; } = Inequality.LessThanOrEqual;
 
         public bool IsSatisfying(Point point) =>
-            Terms.Sum(entry => entry.Key.Value(point)*entry.Value) <= AbsoluteTerm;
+            Terms.Sum(entry => entry.Key.Value(point) * entry.Value) <= AbsoluteTerm;
 
         public override bool Equals(object obj)
         {
@@ -44,12 +36,14 @@ namespace ConstraintsSynthesis.Model
 
         public override int GetHashCode()
         {
-            return (int)Terms.Select(entry => entry.Key.GetHashCode() * entry.Value).Sum();
+            return (int) Terms.Select(entry => entry.Key.GetHashCode() * entry.Value).Sum();
         }
 
         public override string ToString()
         {
-            return string.Join(" + ", Terms.Where(t => Math.Abs(t.Value) > double.Epsilon).Select(t => $"{t.Value} * {t.Key}"));
+            return
+                $"{string.Join(" + ", Terms.Where(t => Math.Abs(t.Value) > double.Epsilon).Select(t => $"{t.Value} * {t.Key}"))} " +
+                $"{(Sign == Inequality.LessThanOrEqual ? "<=" : ">=")} {AbsoluteTerm}";
         }
     }
 }
