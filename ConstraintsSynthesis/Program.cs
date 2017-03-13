@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using CommandLine;
+using ConstraintsSynthesis.Algorithm;
 using ConstraintsSynthesis.Model;
 
 namespace ConstraintsSynthesis
@@ -17,6 +18,8 @@ namespace ConstraintsSynthesis
                 return;
 
             var data = LoadData(options.InputFile, options.Delimiter);
+            var initialSolution = new InitialSolution();
+            var initialConstraints = initialSolution.GenerateInitialConstraints(data);
         }
 
         private static IList<Point> LoadData(string fileName, string delimiter)
