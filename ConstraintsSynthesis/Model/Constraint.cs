@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace ConstraintsSynthesis.Model
 {
-    internal class Constraint
+    public class Constraint
     {
         public Dictionary<Term, double> Terms { get; } = new Dictionary<Term, double>();
         public double AbsoluteTerm { get; set; } = 1;
