@@ -20,5 +20,10 @@
         {
             Coordinates = coordinates;
         }
+
+        public override string ToString()
+        {
+            return $"{string.Join(", ", Coordinates)} {Label}";
+        }
     }
 }
