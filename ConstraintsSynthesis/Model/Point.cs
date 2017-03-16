@@ -3,6 +3,7 @@
     public class Point
     {
         public bool Label { get; set; } = true;
+        public bool IsMarginal { get; set; }
         public double[] Coordinates { get; }
 
         public double this[int index]
