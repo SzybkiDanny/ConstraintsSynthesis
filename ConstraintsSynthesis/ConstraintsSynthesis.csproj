@@ -37,6 +37,10 @@
       <HintPath>..\packages\CommandLineParser.1.9.71\lib\net45\CommandLine.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="MathNet.Numerics, Version=3.17.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MathNet.Numerics.3.17.0\lib\net40\MathNet.Numerics.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -49,6 +53,7 @@
   <ItemGroup>
     <Compile Include="Algorithm\InitialSolution.cs" />
     <Compile Include="Model\Constraint.cs" />
+    <Compile Include="Model\Data.cs" />
     <Compile Include="Model\Inequality.cs" />
     <Compile Include="Model\Point.cs" />
     <Compile Include="Model\Term.cs" />
