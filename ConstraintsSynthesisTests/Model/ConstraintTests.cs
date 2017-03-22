@@ -64,6 +64,26 @@ namespace ConstraintsSynthesisTests.Model
             }
         };
 
+        private static readonly object[] InvertInequalitySignTestCases =
+        {
+            new object[]
+            {
+                Inequality.LessThanOrEqual, 4, Inequality.LessThanOrEqual
+            },
+            new object[]
+            {
+                Inequality.LessThanOrEqual, 5, Inequality.GreaterThanOrEqual
+            },
+            new object[]
+            {
+                Inequality.GreaterThanOrEqual, 7, Inequality.LessThanOrEqual
+            },
+            new object[]
+            {
+                Inequality.GreaterThanOrEqual, 8, Inequality.GreaterThanOrEqual
+            }
+        };
+
         private Constraint _constraint;
 
         [Test]
@@ -93,6 +113,18 @@ namespace ConstraintsSynthesisTests.Model
             var actual = _constraint.ToString();
 
             Assert.AreEqual(expected, actual);
+        }
+
+        [Test]
+        [TestCaseSource(nameof(InvertInequalitySignTestCases))]
+        public void InvertInequalitySignTest(Inequality initialSign, int reversalsCount, Inequality expectedSign)
+        {
+            _constraint.Sign = initialSign;
+
+            for (var i = 0; i < reversalsCount; i++)
+                _constraint.InvertInequalitySing();
+
+            Assert.AreEqual(expectedSign, _constraint.Sign);
         }
     }
 }

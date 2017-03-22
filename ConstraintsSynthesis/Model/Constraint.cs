@@ -16,8 +16,15 @@ namespace ConstraintsSynthesis.Model
             set { Terms[index] = value; }
         }
 
-        public bool IsSatisfying(Point point) =>
-            Terms.Sum(entry => entry.Key.Value(point) * entry.Value) <= AbsoluteTerm;
+        public bool IsSatisfying(Point point)
+        {
+            if (Sign == Inequality.LessThanOrEqual)
+                return Terms.Sum(entry => entry.Key.Value(point) * entry.Value) <= AbsoluteTerm;
+            return Terms.Sum(entry => entry.Key.Value(point) * entry.Value) >= AbsoluteTerm;
+        }
+
+        public void InvertInequalitySing() =>
+            Sign = (Inequality) ((int)(Sign+1) % 2);
 
         public override bool Equals(object obj)
         {
