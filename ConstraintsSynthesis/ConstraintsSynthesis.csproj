@@ -51,10 +51,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Algorithm\LinearConstraintsGenerator.cs" />
     <Compile Include="Algorithm\InitialSolution.cs" />
+    <Compile Include="Algorithm\ConstraintLocalOptimization.cs" />
     <Compile Include="Model\Constraint.cs" />
     <Compile Include="Model\Data.cs" />
     <Compile Include="Model\Inequality.cs" />
+    <Compile Include="Model\LinearConstraint.cs" />
     <Compile Include="Model\Point.cs" />
     <Compile Include="Model\Term.cs" />
     <Compile Include="Options.cs" />
