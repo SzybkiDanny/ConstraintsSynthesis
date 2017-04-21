@@ -11,6 +11,7 @@ namespace ConstraintsSynthesis.Model
         private readonly MersenneTwister _random = new MersenneTwister();
 
         public List<Point> Points { get; } = new List<Point>();
+        public int Dimensions { get; private set; }
 
         public void Load(string filename, string delimiter = "")
         {
@@ -33,14 +34,14 @@ namespace ConstraintsSynthesis.Model
             }
 
             Points.AddRange(data);
+            Dimensions = data.First().Coordinates.Length;
         }
 
-        public List<Point> FindMarginalPoints(int count)
+        public IEnumerable<Point> FindMarginalPoints()
         {
-            var result = new List<Point>();
             var consideredPoints = new List<Point>(Points);
 
-            for (int i = 0; i < count; i++)
+            for (var i = 0; i < Points.Count; i++)
             {
                 var randomPoint = GetRandomPoint();
                 var maxDistance = 0.0;
@@ -57,10 +58,9 @@ namespace ConstraintsSynthesis.Model
                 }
  
                 consideredPoints.Remove(marginalPoint);
-                result.Add(marginalPoint);
-            }
 
-            return result;
+                yield return marginalPoint;
+            }
         }
 
         private Point GetRandomPoint() => 
