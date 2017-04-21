@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace ConstraintsSynthesis.Model
 {
-    public class Constraint
+    public class Constraint : ICloneable
     {
         public Dictionary<Term, double> Terms { get; } = new Dictionary<Term, double>();
         public double AbsoluteTerm { get; set; } = 1;
@@ -48,6 +48,18 @@ namespace ConstraintsSynthesis.Model
         public override int GetHashCode()
         {
             return (int) Terms.Select(entry => entry.Key.GetHashCode() * entry.Value).Sum();
+        }
+
+        public virtual object Clone()
+        {
+            var clonedConstrained = new Constraint() {AbsoluteTerm = AbsoluteTerm, Sign = Sign};
+
+            foreach (var term in Terms)
+            {
+                clonedConstrained.Terms.Add(term.Key, term.Value);
+            }
+
+            return clonedConstrained;
         }
 
         public override string ToString()
