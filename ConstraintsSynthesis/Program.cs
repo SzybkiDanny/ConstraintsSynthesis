@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.Linq;
+using System.Windows.Forms;
 using CommandLine;
 using ConstraintsSynthesis.Algorithm;
 using ConstraintsSynthesis.Model;
+using ConstraintsSynthesis.Visualization;
 
 namespace ConstraintsSynthesis
 {
@@ -17,31 +16,26 @@ namespace ConstraintsSynthesis
             if (!Parser.Default.ParseArguments(args, options))
                 return;
 
-            var data = LoadData(options.InputFile, options.Delimiter);
-            var initialSolution = new InitialSolution();
-            var initialConstraints = initialSolution.GenerateInitialConstraints(data);
-        }
+            var data = new Data();
 
-        private static IList<Point> LoadData(string fileName, string delimiter)
-        {
-            var data = new List<Point>();
+            data.Load(options.InputFile, options.Delimiter);
 
-            using (var file = new StreamReader(fileName))
+            var xmeans = new XMeans();
+            xmeans.Fit(data.Points);
+
+            var clusters = xmeans.Clusters;
+
+            var solutions = clusters.Select(c => new Solution(c)).ToArray();
+
+            foreach (var solution in solutions)
             {
-                while (!file.EndOfStream)
-                {
-                    var values =
-                        file.ReadLine()?.Split(new[] {delimiter}, StringSplitOptions.None).Select(double.Parse);
-                    var point = new Point(values.Take(values.Count() - 1).ToArray())
-                    {
-                        Label = Math.Abs(values.Last() - 1.0) < double.Epsilon
-                    };
-
-                    data.Add(point);
-                }
+                solution.GenerateInitialSolution()
+                    .GenerateImprovedInitialConstraints()
+                .GenerateImprovingConstraints(5);
             }
 
-            return data;
+            Application.EnableVisualStyles();
+            Application.Run(new VisualizationApplicationContext(solutions, data.Dimensions));
         }
     }
 }
