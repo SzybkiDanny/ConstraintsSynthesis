@@ -26,20 +26,15 @@ namespace ConstraintsSynthesis.Algorithm
             PositivePoints = Points.Where(p => p.Label).ToList();
         }
 
-        public void Optimize(bool optimizeSign = true, bool optimizeCoefficients = true, bool squeezeConstraint = true)
+        public ConstraintLocalOptimization OptimizeSign()
         {
-            if (optimizeSign && SatisfiedPointsCount*2 < PositivePoints.Count)
+            if (SatisfiedPointsCount * 2 < PositivePoints.Count)
                 Constraint.InvertInequalitySing();
 
-            if (optimizeCoefficients)
-                OptimizeCoefficients();
-
-            if (squeezeConstraint)
-                SqueezeConstraint();
-
+            return this;
         }
 
-        private void OptimizeCoefficients()
+        public ConstraintLocalOptimization OptimizeCoefficients()
         {
             while (NotSatisfiedPoints.Count > 0)
             {
@@ -60,9 +55,11 @@ namespace ConstraintsSynthesis.Algorithm
 
                 Constraint[selectedTerm] += CoefficientOptimizationStep*stepSign;
             }
+
+            return this;
         }
 
-        private void SqueezeConstraint()
+        public ConstraintLocalOptimization SqueezeConstraint()
         {
             var termsToSqueeze = new List<Term>(Constraint.Terms.Keys);
             var stepSign = Constraint.Sign == Inequality.LessThanOrEqual ? 1 : -1;
@@ -85,6 +82,8 @@ namespace ConstraintsSynthesis.Algorithm
                     termsToSqueeze.RemoveAt(selectedIndex);
                 }
             }
+
+            return this;
         }
 
         private int TestCoefficientChange(Term term, double step)

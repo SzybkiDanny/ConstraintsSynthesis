@@ -36,7 +36,7 @@ namespace ConstraintsSynthesis.Model
                 var newConstraint = initialConstraint.Clone() as LinearConstraint;
                 var optimizer = new ConstraintLocalOptimization(newConstraint, Cluster.Points);
 
-                optimizer.Optimize(optimizeCoefficients: false, optimizeSign: false, squeezeConstraint: true);
+                optimizer.SqueezeConstraint();
                 Constraints.Add(optimizer.Constraint as LinearConstraint);
             }
 
@@ -51,7 +51,9 @@ namespace ConstraintsSynthesis.Model
             {
                 var optimizer = new ConstraintLocalOptimization(constraint, Cluster.Points);
 
-                optimizer.Optimize(optimizeCoefficients: true, optimizeSign: false, squeezeConstraint: true);
+                optimizer.OptimizeSign()
+                    .OptimizeCoefficients()
+                    .SqueezeConstraint();
                 Constraints.Add(optimizer.Constraint as LinearConstraint);
             }
 
