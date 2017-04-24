@@ -26,18 +26,21 @@ namespace ConstraintsSynthesis.Model
             return this;
         }
 
-        public Solution GenerateImprovedInitialConstraints()
+        public Solution GenerateImprovedInitialConstraints(int iterations = 1)
         {
             if (InitialConstraints == null)
                 throw new Exception("No initial constraints are generated");
 
-            foreach (var initialConstraint in InitialConstraints)
+            for (var i = 0; i < iterations; i++)
             {
-                var newConstraint = initialConstraint.Clone() as LinearConstraint;
-                var optimizer = new ConstraintLocalOptimization(newConstraint, Cluster.Points);
+                foreach (var initialConstraint in InitialConstraints)
+                {
+                    var newConstraint = initialConstraint.Clone() as LinearConstraint;
+                    var optimizer = new ConstraintLocalOptimization(newConstraint, Cluster.Points);
 
-                optimizer.SqueezeConstraint();
-                Constraints.Add(optimizer.Constraint as LinearConstraint);
+                    optimizer.SqueezeConstraint();
+                    Constraints.Add(optimizer.Constraint as LinearConstraint);
+                }
             }
 
             return this;
