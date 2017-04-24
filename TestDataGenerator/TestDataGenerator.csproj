@@ -52,6 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Generators\IShapeGenerator.cs" />
+    <Compile Include="Generators\SphereFromUniformGenerator.cs" />
     <Compile Include="Generators\SphereGenerator.cs" />
     <Compile Include="Model\Point.cs" />
     <Compile Include="Model\Shapes.cs" />

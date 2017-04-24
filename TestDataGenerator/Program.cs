@@ -28,6 +28,9 @@ namespace TestDataGenerator
                 case Shapes.Sphere:
                     generator = new SphereGenerator();
                     break;
+                case Shapes.SphereFromUniform:
+                    generator = new SphereFromUniformGenerator();
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(args));
             }

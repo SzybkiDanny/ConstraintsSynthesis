@@ -2,6 +2,7 @@
 {
     enum Shapes
     {
-        Sphere
+        Sphere,
+        SphereFromUniform
     }
 }
