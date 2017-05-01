@@ -8,7 +8,7 @@ namespace ConstraintsSynthesis.Model
 {
     public class Data
     {
-        private readonly MersenneTwister _random = new MersenneTwister();
+        private readonly MersenneTwister _random = new MersenneTwister(Program.Seed);
 
         public List<Point> Points { get; } = new List<Point>();
         public int Dimensions { get; private set; }

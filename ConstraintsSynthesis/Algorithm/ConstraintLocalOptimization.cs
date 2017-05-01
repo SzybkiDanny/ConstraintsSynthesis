@@ -7,7 +7,7 @@ namespace ConstraintsSynthesis.Algorithm
 {
     public class ConstraintLocalOptimization
     {
-        private readonly MersenneTwister _random = new MersenneTwister();
+        private readonly MersenneTwister _random = new MersenneTwister(Program.Seed);
         private List<Point> PositivePoints { get; }
         private List<Point> NotSatisfiedPoints =>
             PositivePoints.Where(p => !Constraint.IsSatisfying(p)).ToList();

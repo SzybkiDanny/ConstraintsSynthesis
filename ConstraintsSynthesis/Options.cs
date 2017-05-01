@@ -17,6 +17,9 @@ namespace ConstraintsSynthesis
             HelpText = "Data delimiter in input file.")]
         public string Delimiter { get; set; }
 
+        [Option("seed", HelpText = "Seed for all random operations.")]
+        public int? Seed { get; set; }
+
         [HelpOption]
         public string GetUsage() => HelpText.AutoBuild(this,
             current => HelpText.DefaultParsingErrorsHandler(this, current));

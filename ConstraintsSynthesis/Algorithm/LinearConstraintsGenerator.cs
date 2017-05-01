@@ -8,7 +8,7 @@ namespace ConstraintsSynthesis.Algorithm
 {
     public static class LinearConstraintsGenerator
     {
-        private static readonly MersenneTwister Random = new MersenneTwister();
+        private static readonly MersenneTwister Random = new MersenneTwister(Program.Seed);
 
         public static IEnumerable<LinearConstraint> GenerateRandomLinearConstraints(IList<Point> data,
             int constraintsCount)
