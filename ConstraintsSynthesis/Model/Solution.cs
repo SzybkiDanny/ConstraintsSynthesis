@@ -18,7 +18,7 @@ namespace ConstraintsSynthesis.Model
 
         public Solution GenerateInitialSolution()
         {
-            var initialConstraints = InitialSolutionGenerator.GenerateInitialConstraints(Cluster.Points).ToArray();
+            var initialConstraints = InitialSolutionGenerator.GenerateInitialConstraints(Cluster).ToArray();
 
             InitialConstraints = new List<LinearConstraint>(initialConstraints);
             Constraints.AddRange(initialConstraints);
@@ -36,7 +36,7 @@ namespace ConstraintsSynthesis.Model
                 foreach (var initialConstraint in InitialConstraints)
                 {
                     var newConstraint = initialConstraint.Clone() as LinearConstraint;
-                    var optimizer = new ConstraintLocalOptimization(newConstraint, Cluster.Points);
+                    var optimizer = new ConstraintLocalOptimization(newConstraint, Cluster);
 
                     optimizer.SqueezeConstraint();
                     Constraints.Add(optimizer.Constraint as LinearConstraint);
@@ -48,11 +48,11 @@ namespace ConstraintsSynthesis.Model
 
         public Solution GenerateImprovingConstraints(int count = 100)
         {
-            var randomLinearConstraints = LinearConstraintsGenerator.GenerateRandomLinearConstraints(Cluster.Points, count);
+            var randomLinearConstraints = LinearConstraintsGenerator.GenerateRandomLinearConstraints(Cluster, count);
 
             foreach (var constraint in randomLinearConstraints)
             {
-                var optimizer = new ConstraintLocalOptimization(constraint, Cluster.Points);
+                var optimizer = new ConstraintLocalOptimization(constraint, Cluster);
 
                 optimizer.OptimizeSign()
                     .OptimizeCoefficients()

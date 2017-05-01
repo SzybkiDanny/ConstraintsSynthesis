@@ -19,10 +19,10 @@ namespace ConstraintsSynthesis.Algorithm
         public int SatisfiedPointsCount =>
             PositivePoints.Count(Constraint.IsSatisfying);
 
-        public ConstraintLocalOptimization(Constraint constraint, List<Point> points)
+        public ConstraintLocalOptimization(Constraint constraint, Cluster cluster)
         {
             Constraint = constraint;
-            Points = points;
+            Points = cluster.Points;
             PositivePoints = Points.Where(p => p.Label).ToList();
         }
 
