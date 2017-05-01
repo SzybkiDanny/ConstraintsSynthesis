@@ -38,6 +38,10 @@ namespace TestDataGenerator
             HelpText = "Origin of the generated shape.")]
         public double[] Center { get; set; }
 
+        [Option('m', "multiplicity", DefaultValue = 2,
+            HelpText = "Number of shapes to generate.")]
+        public int Multiplicity { get; set; }
+
         [HelpOption]
         public string GetUsage() => HelpText.AutoBuild(this,
             current => HelpText.DefaultParsingErrorsHandler(this, current));

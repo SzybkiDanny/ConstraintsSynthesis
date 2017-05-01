@@ -31,12 +31,15 @@ namespace TestDataGenerator
                 case Shapes.SphereFromUniform:
                     generator = new SphereFromUniformGenerator();
                     break;
+                case Shapes.MultipleClouds:
+                    generator = new MultipleCloudsGenerator();
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(args));
             }
 
             var data = generator.Generate(options.Dimensions, options.Radius, options.Center,
-                options.Positives, options.Negatives);
+                options.Positives, options.Negatives, options.Multiplicity);
 
             WriteToFile(data, options.OutputFile, options.Delimiter);
         }

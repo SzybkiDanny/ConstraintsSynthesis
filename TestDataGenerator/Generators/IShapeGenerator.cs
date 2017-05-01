@@ -5,6 +5,6 @@ namespace TestDataGenerator.Generators
 {
     internal interface IShapeGenerator
     {
-        IList<Point> Generate(int dimensions, double radius, double[] center, int positives, int negatives = 0);
+        IList<Point> Generate(int dimensions, double radius, double[] center, int positives, int negatives = 0, int multiplicity = 1);
     }
 }

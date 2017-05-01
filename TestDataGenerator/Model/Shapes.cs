@@ -3,6 +3,7 @@
     enum Shapes
     {
         Sphere,
-        SphereFromUniform
+        SphereFromUniform,
+        MultipleClouds
     }
 }

@@ -15,7 +15,7 @@ namespace TestDataGenerator.Generators
         // The points inside the sphere are uniformly distributed
         // For explanation look at: http://math.stackexchange.com/a/87238
         public IList<Point> Generate(int dimensions, double radius, double[] center, int positives,
-            int negatives = 0)
+            int negatives = 0, int multiplicity = 1)
         {
             var totalPointsCount = positives + negatives;
 
