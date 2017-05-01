@@ -16,7 +16,7 @@ namespace ConstraintsSynthesis.Model
         public int Size => Points.Count;
         public List<Point> Points { get; }
         public double[] Centroid { get; }
-        public double[][] Covarianve { get; }
+        public double[][] Covariance { get; }
         public double[] Minimums { get; }
         public double[] Maximums { get; }
         public int Dimensions { get; }
@@ -28,7 +28,7 @@ namespace ConstraintsSynthesis.Model
             K = Dimensions * (Dimensions + 3) / 2;
             Points = points;
             Centroid = kmeans.Clusters[index].Centroid;
-            Covarianve = kmeans.Clusters[index].Covariance;
+            Covariance = kmeans.Clusters[index].Covariance;
             Minimums = new double[Dimensions];
             Maximums = new double[Dimensions];
 

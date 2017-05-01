@@ -40,8 +40,8 @@ namespace ConstraintsSynthesis.Algorithm
                 var c2 = splitClusters[1];
 
                 var beta = c1.Centroid.Subtract(c2.Centroid).Euclidean()/
-                           Math.Sqrt(c1.Covarianve.PseudoDeterminant() +
-                                     c2.Covarianve.PseudoDeterminant());
+                           Math.Sqrt(c1.Covariance.PseudoDeterminant() +
+                                     c2.Covariance.PseudoDeterminant());
                 var alpha = 0.5/NormalDistribution.Standard.DistributionFunction(beta);
                 var bic = -2*
                           (cluster.Size*Math.Log(alpha) + c1.LogLikelihood +
