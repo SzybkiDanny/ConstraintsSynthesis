@@ -17,21 +17,31 @@ namespace ConstraintsSynthesis.Model
         public List<Point> Points { get; }
         public double[] Centroid { get; }
         public double[][] Covarianve { get; }
+        public double[] Minimums { get; }
+        public double[] Maximums { get; }
+        public int Dimensions { get; }
 
         public Cluster(List<Point> points, KMeans kmeans, int index)
         {
+            Dimensions = points.First().Coordinates.Length;
+
+            K = Dimensions * (Dimensions + 3) / 2;
             Points = points;
             Centroid = kmeans.Clusters[index].Centroid;
             Covarianve = kmeans.Clusters[index].Covariance;
-
-            var d = points.First().Coordinates.Length;
-            K = d*(d + 3)/2;
+            Minimums = new double[Dimensions];
+            Maximums = new double[Dimensions];
 
             var pointsMatrix = points.Select(p => p.Coordinates).ToArray();
             var means = pointsMatrix.Mean(pointsMatrix.Transpose().Select(x => x.Sum()).ToArray());
             var covariance = pointsMatrix.Covariance(means);
 
-            _multivariateNormalDistribution = new MultivariateNormalDistribution(means, covariance);
+            for (var i = 0; i < Dimensions; i++)
+            {
+                Minimums[i] = points.Min(p => p[i]);
+                Maximums[i] = points.Max(p => p[i]);
+                _multivariateNormalDistribution = new MultivariateNormalDistribution(means, covariance);
+            }
         }
 
         public double LogLikelihood =>
@@ -40,6 +50,5 @@ namespace ConstraintsSynthesis.Model
 
         public double BIC =>
             -2*LogLikelihood + K*Math.Log(Size);
-
     }
 }
