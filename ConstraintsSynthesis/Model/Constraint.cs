@@ -16,12 +16,13 @@ namespace ConstraintsSynthesis.Model
             set { Terms[index] = value; }
         }
 
-        public bool IsSatisfying(Point point)
-        {
-            if (Sign == Inequality.LessThanOrEqual)
-                return Terms.Sum(entry => entry.Key.Value(point) * entry.Value) <= AbsoluteTerm;
-            return Terms.Sum(entry => entry.Key.Value(point) * entry.Value) >= AbsoluteTerm;
-        }
+        public bool IsSatisfying(Point point) =>
+            Sign == Inequality.LessThanOrEqual
+                ? ValueForPoint(point) <= AbsoluteTerm
+                : ValueForPoint(point) >= AbsoluteTerm;
+
+        public double ValueForPoint(Point point) =>
+            Terms.Sum(entry => entry.Key.Value(point)*entry.Value);
 
         public void InvertInequalitySing() =>
             Sign = (Inequality) ((int)(Sign+1) % 2);
