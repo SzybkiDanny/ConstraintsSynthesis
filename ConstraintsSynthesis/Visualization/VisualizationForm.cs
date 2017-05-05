@@ -25,7 +25,9 @@ namespace ConstraintsSynthesis.Visualization
             var plotModel = new PlotModel
             {
                 Title =
-                    $"Constraints Synthesis x{_solutionVisualizations.First().XIndex}, x{_solutionVisualizations.First().YIndex}"
+                    $"Constraints Synthesis x{_solutionVisualizations.First().XIndex}, " +
+                    $"x{_solutionVisualizations.First().YIndex}",
+                PlotType = PlotType.Cartesian
             };
 
             foreach (var solutionVisualization in _solutionVisualizations)
@@ -36,7 +38,7 @@ namespace ConstraintsSynthesis.Visualization
             foreach (
                 var constraintsSeries in
                     _solutionVisualizations.SelectMany(
-                        solutionVisualization => solutionVisualization.GetConstraintsSeries()))
+                        solutionVisualization => solutionVisualization.GetConstraintsSeries(trimConstraints:false)))
             {
                 plotModel.Series.Add(constraintsSeries);
             }

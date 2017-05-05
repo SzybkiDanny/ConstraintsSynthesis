@@ -42,7 +42,7 @@ namespace ConstraintsSynthesis.Visualization
             return clusterPoints;
         }
 
-        public IEnumerable<Series> GetConstraintsSeries()
+        public IEnumerable<Series> GetConstraintsSeries(bool skipIrrelevant = true, bool trimConstraints = true, double additionalMarginSize = 0.1)
         {
             foreach (var constraint in Solution.Constraints)
             {
@@ -55,40 +55,44 @@ namespace ConstraintsSynthesis.Visualization
                     var leftY = ConstraintFunctionValue(constraint, minX);
                     var rightY = ConstraintFunctionValue(constraint, maxX);
 
-                    if ((leftY > MaxY || leftY < MinY) && (rightY > MaxY || rightY < MinY))
+                    if (skipIrrelevant && (leftY > MaxY || leftY < MinY) && (rightY > MaxY || rightY < MinY))
                         continue;
 
-                    while (leftY > MaxY || leftY < MinY)
+                    if (trimConstraints)
                     {
-                        deltaX = (maxX - minX)/10;
-                        minX += deltaX;
+                        while (leftY > MaxY || leftY < MinY)
+                        {
+                            deltaX = (maxX - minX)/10;
+                            minX += deltaX;
 
-                        if (deltaX < 0.1)
-                            break;
+                            if (deltaX < 0.1)
+                                break;
 
-                        leftY = ConstraintFunctionValue(constraint, minX);
+                            leftY = ConstraintFunctionValue(constraint, minX);
+                        }
+
+                        minX -= deltaX;
+                        deltaX = 0;
+
+                        while (rightY > MaxY || rightY < MinY)
+                        {
+                            deltaX = (maxX - minX)/10;
+                            maxX -= deltaX;
+
+                            if (deltaX < 0.1)
+                                break;
+
+                            rightY = ConstraintFunctionValue(constraint, maxX);
+                        }
+
+                        maxX += deltaX;
                     }
 
-                    minX -= deltaX;
-                    deltaX = 0;
-
-                    while (rightY > MaxY || rightY < MinY)
-                    {
-                        deltaX = (maxX - minX)/10;
-                        maxX -= deltaX;
-
-                        if (deltaX < 0.1)
-                            break;
-
-                        rightY = ConstraintFunctionValue(constraint, maxX);
-                    }
-
-                    maxX += deltaX;
-
+                    var plotMargin = (maxX - minX)*additionalMarginSize;
                     var constraintLine =
                         new FunctionSeries(
                             x => (-constraint[XIndex] * x + constraint.AbsoluteTerm) / constraint[YIndex],
-                            minX, maxX, 2) { Color = Color};
+                            minX - plotMargin, maxX + plotMargin, 2) { Color = Color};
 
                     yield return constraintLine;
                 }
