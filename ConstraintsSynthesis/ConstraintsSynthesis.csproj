@@ -87,6 +87,7 @@
     <Compile Include="Algorithm\LinearConstraintsGenerator.cs" />
     <Compile Include="Algorithm\InitialSolutionGenerator.cs" />
     <Compile Include="Algorithm\ConstraintLocalOptimization.cs" />
+    <Compile Include="Algorithm\RedundantConstraintsFinder.cs" />
     <Compile Include="Algorithm\XMeans.cs" />
     <Compile Include="Model\Cluster.cs" />
     <Compile Include="Model\Constraint.cs" />

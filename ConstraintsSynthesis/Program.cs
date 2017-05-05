@@ -37,8 +37,9 @@ namespace ConstraintsSynthesis
             foreach (var solution in solutions)
             {
                 solution.GenerateInitialSolution()
-                    .GenerateImprovedInitialConstraints()
-                .GenerateImprovingConstraints(5);
+                    .GenerateImprovedInitialConstraints(5)
+                    .GenerateImprovingConstraints()
+                    .RemoveRedundantConstraints();
             }
 
             Application.EnableVisualStyles();

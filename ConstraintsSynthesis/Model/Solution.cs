@@ -62,5 +62,21 @@ namespace ConstraintsSynthesis.Model
 
             return this;
         }
+
+        public Solution RemoveRedundantConstraints(int samplingSize = 100)
+        {
+            var redundantConstraintsFinder = new RedundantConstraintsFinder(this, samplingSize, 0.0);
+            var redundantIndices = redundantConstraintsFinder.FindRedundantConstraints();
+
+            redundantIndices.Sort();
+            redundantIndices.Reverse();
+
+            foreach (var indexToRemove in redundantIndices)
+            {
+                Constraints.RemoveAt(indexToRemove);
+            }
+
+            return this;
+        }
     }
 }
