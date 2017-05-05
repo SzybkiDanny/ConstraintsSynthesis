@@ -90,6 +90,7 @@
     <Compile Include="Algorithm\XMeans.cs" />
     <Compile Include="Model\Cluster.cs" />
     <Compile Include="Model\Constraint.cs" />
+    <Compile Include="Model\ConstraintsSatisfaction.cs" />
     <Compile Include="Model\Data.cs" />
     <Compile Include="Model\Inequality.cs" />
     <Compile Include="Model\LinearConstraint.cs" />
