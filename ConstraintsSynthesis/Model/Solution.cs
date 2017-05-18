@@ -46,7 +46,7 @@ namespace ConstraintsSynthesis.Model
             return this;
         }
 
-        public Solution GenerateImprovingConstraints(int count = 100)
+        public Solution GenerateRandomConstraints(int count = 100, bool optimizeSign = true, bool optimizeCoefficients = true, bool squeezeConstraints = true)
         {
             var randomLinearConstraints = LinearConstraintsGenerator.GenerateRandomLinearConstraints(Cluster, count);
 
@@ -54,9 +54,15 @@ namespace ConstraintsSynthesis.Model
             {
                 var optimizer = new ConstraintLocalOptimization(constraint, Cluster);
 
-                optimizer.OptimizeSign()
-                    .OptimizeCoefficients()
-                    .SqueezeConstraint();
+                if (optimizeSign)
+                    optimizer.OptimizeSign();
+                
+                if (optimizeCoefficients)
+                    optimizer.OptimizeCoefficients();
+
+                if (squeezeConstraints)
+                    optimizer.SqueezeConstraint();
+
                 Constraints.Add(optimizer.Constraint as LinearConstraint);
             }
 
