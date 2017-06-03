@@ -4,23 +4,27 @@ using System.Linq;
 using Accord.MachineLearning;
 using Accord.Math;
 using Accord.Statistics.Distributions.Univariate;
+using Accord.Statistics.Filters;
 using ConstraintsSynthesis.Model;
 
 namespace ConstraintsSynthesis.Algorithm
 {
     public class XMeans
     {
-        public readonly int MinK;
+        private static readonly Normalization Normalization = new Normalization();
+        public int MinK { get; }
+        public bool Normalize { get; }
         public IList<Cluster> Clusters { get; } = new List<Cluster>();
 
-        public XMeans(int minK = 2)
+        public XMeans(int minK = 1, bool normalize = true)
         {
             MinK = minK;
+            Normalize = normalize;
         }
 
         public void Fit(IList<Point> points)
         {
-            var clusters = SplitPointsIntoClusters(points, MinK);
+            var clusters = SplitPointsIntoClusters(points, MinK, Normalize);
 
             RecursivelySplit(clusters);
         }
@@ -35,7 +39,7 @@ namespace ConstraintsSynthesis.Algorithm
                     continue;
                 }
 
-                var splitClusters = SplitPointsIntoClusters(cluster.Points, 2);
+                var splitClusters = SplitPointsIntoClusters(cluster.Points, 2, Normalize);
                 var c1 = splitClusters[0];
                 var c2 = splitClusters[1];
 
@@ -54,10 +58,17 @@ namespace ConstraintsSynthesis.Algorithm
             }
         }
 
-        private static IList<Cluster> SplitPointsIntoClusters(IList<Point> points, int clustersCount)
+        private static IList<Cluster> SplitPointsIntoClusters(IList<Point> points, int clustersCount, bool normalize)
         {
             var observations = points.Select(p => p.Coordinates).ToArray();
             var kmeans = new KMeans(clustersCount);
+
+            if (normalize)
+            {
+                Normalization.Detect(observations);
+                observations = Normalization.Apply(observations);
+            }
+
             var initialClustersIndices = kmeans.Learn(observations).Decide(observations);
             var distinctIndices = initialClustersIndices.Distinct();
             var clusters =
