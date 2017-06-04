@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using Accord.Math;
 using ConstraintsSynthesis.Model;
 using MathNet.Numerics.Random;
 
@@ -47,28 +49,67 @@ namespace ConstraintsSynthesis.Algorithm
             }
         }
 
-        public List<int> FindRedundantConstraints()
+        public List<int> FindRedundantConstraints(int pointsBetweenConstraintsMaximum = 5, double angleSimilarityMarigin = 5.0)
         {
             var constraints = _solution.Constraints.Cast<Constraint>().ToList();
+            var similarConstraints = FindSimilarConstraints(constraints, angleSimilarityMarigin);
             var redundant = new List<int>();
+            var satisfaction = new ConstraintsSatisfaction(constraints, _randomPoints);
 
-            var cs = new ConstraintsSatisfaction(constraints, _randomPoints);
-
-            for (var i = 0; i < constraints.Count; i++)
+            foreach (var firstConstraint in similarConstraints)
             {
-                for (var j = i + 1; j < constraints.Count; j++)
-                {
-                    var firstUnsatisfiedSet = cs.GetUnsatisfyingPointsIndices(constraints[i]).ToList();
-                    var secondUnsatisfiedSet = cs.GetUnsatisfyingPointsIndices(constraints[j]).ToList();
+                var setUnsatisfiedByFirst =
+                    satisfaction.GetUnsatisfyingPointsIndices(constraints[firstConstraint.Key])
+                        .ToList();
 
-                    if (!firstUnsatisfiedSet.Except(secondUnsatisfiedSet).Any())
-                        redundant.Add(i);
-                    else if (!secondUnsatisfiedSet.Except(firstUnsatisfiedSet).Any())
-                        redundant.Add(j);
+                foreach (var secondConstraintIndex in firstConstraint.Value)
+                {
+                    var setUnsatisfiedBySecond =
+                        satisfaction.GetUnsatisfyingPointsIndices(constraints[secondConstraintIndex])
+                            .ToList();
+
+                    if (setUnsatisfiedByFirst.Except(setUnsatisfiedBySecond).Count()
+                            <= pointsBetweenConstraintsMaximum)
+                        redundant.Add(firstConstraint.Key);
+                    else if (setUnsatisfiedBySecond.Except(setUnsatisfiedByFirst).Count()
+                                <= pointsBetweenConstraintsMaximum)
+                        redundant.Add(secondConstraintIndex);
                 }
             }
 
             return redundant.Distinct().ToList();
+        }
+
+        private IDictionary<int, List<int>> FindSimilarConstraints(IList<Constraint> constraints, double angleSimilarityMarigin)
+        {
+            var similarConstraints = new Dictionary<int, List<int>>();
+
+            for (var i = 0; i < constraints.Count; i++)
+            {
+                similarConstraints[i] = new List<int>();
+
+                var constraintCoefficients = constraints[i].Terms.Values.ToArray();
+
+                for (var j = 0; j < constraints.Count; j++)
+                {
+                    if (j == i)
+                        continue;
+
+                    var secondConstraintCoefficients = constraints[j].Terms.Values.ToArray();
+                    var cosinus = constraintCoefficients.Dot(secondConstraintCoefficients) /
+                                  (constraintCoefficients.Euclidean() *
+                                   secondConstraintCoefficients.Euclidean());
+
+                    cosinus = cosinus > 1 ? 1 : cosinus < -1 ? -1 : cosinus;
+
+                    var angle = Math.Acos(cosinus) * 180 / Math.PI;
+
+                    if (angle <= angleSimilarityMarigin)
+                        similarConstraints[i].Add(j);
+                }
+            }
+
+            return similarConstraints;
         }
     }
 }
