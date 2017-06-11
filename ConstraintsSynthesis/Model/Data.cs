@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using MathNet.Numerics.Random;
+using MethodTimer;
 
 namespace ConstraintsSynthesis.Model
 {
@@ -13,6 +14,7 @@ namespace ConstraintsSynthesis.Model
         public List<Point> Points { get; } = new List<Point>();
         public int Dimensions { get; private set; }
 
+        [Time("Loading input data")]
         public void Load(string filename, string delimiter = "")
         {
             var data = new List<Point>();
@@ -36,6 +38,7 @@ namespace ConstraintsSynthesis.Model
             Points.AddRange(data);
             Dimensions = data.First().Coordinates.Length;
         }
+
 
         public IEnumerable<Point> FindMarginalPoints()
         {

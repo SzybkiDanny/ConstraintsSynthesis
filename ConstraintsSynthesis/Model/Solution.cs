@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using ConstraintsSynthesis.Algorithm;
+using MethodTimer;
 
 namespace ConstraintsSynthesis.Model
 {
@@ -16,6 +17,7 @@ namespace ConstraintsSynthesis.Model
             Cluster = cluster;
         }
 
+        [Time("Generating initial constraints")]
         public Solution GenerateInitialSolution()
         {
             var initialConstraints = InitialSolutionGenerator.GenerateInitialConstraints(Cluster).ToArray();
@@ -26,6 +28,7 @@ namespace ConstraintsSynthesis.Model
             return this;
         }
 
+        [Time("Generating constraints based on initial constraints")]
         public Solution GenerateImprovedInitialConstraints(int iterations = 1)
         {
             if (InitialConstraints == null)
@@ -45,7 +48,7 @@ namespace ConstraintsSynthesis.Model
 
             return this;
         }
-
+        [Time("Generating random constraints")]
         public Solution GenerateRandomConstraints(int count = 100, bool optimizeSign = true, bool optimizeCoefficients = true, bool squeezeConstraints = true)
         {
             var randomLinearConstraints = LinearConstraintsGenerator.GenerateRandomLinearConstraints(Cluster, count);
@@ -69,6 +72,7 @@ namespace ConstraintsSynthesis.Model
             return this;
         }
 
+        [Time("Removing redundant constraints")]
         public Solution RemoveRedundantConstraints(int samplingSize = 100)
         {
             var redundantConstraintsFinder = new RedundantConstraintsFinder(this, samplingSize, 0.0);

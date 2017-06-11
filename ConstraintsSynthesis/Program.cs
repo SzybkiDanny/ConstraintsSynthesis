@@ -21,8 +21,9 @@ namespace ConstraintsSynthesis
             if (!Parser.Default.ParseArguments(args, options))
                 return;
 
+            MethodTimeLogger.LogLevel = options.LogLevel;
             Generator.Seed = Seed = options.Seed ?? DateTime.Now.Millisecond;
-
+            
             var data = new Data();
 
             data.Load(options.InputFile, options.Delimiter);
@@ -38,7 +39,7 @@ namespace ConstraintsSynthesis
             {
                 solution.GenerateInitialSolution()
                     .GenerateImprovedInitialConstraints(5)
-                    .GenerateImprovingConstraints()
+                    .GenerateRandomConstraints(20)
                     .RemoveRedundantConstraints();
             }
 

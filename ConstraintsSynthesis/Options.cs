@@ -20,6 +20,10 @@ namespace ConstraintsSynthesis
         [Option("seed", HelpText = "Seed for all random operations.")]
         public int? Seed { get; set; }
 
+        [Option("logLevel", DefaultValue = TimeLogLevel.General,
+            HelpText = "Seed for all random operations.")]
+        public TimeLogLevel LogLevel { get; set; }
+
         [HelpOption]
         public string GetUsage() => HelpText.AutoBuild(this,
             current => HelpText.DefaultParsingErrorsHandler(this, current));

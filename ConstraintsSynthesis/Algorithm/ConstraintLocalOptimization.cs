@@ -2,6 +2,7 @@
 using System.Linq;
 using ConstraintsSynthesis.Model;
 using MathNet.Numerics.Random;
+using MethodTimer;
 
 namespace ConstraintsSynthesis.Algorithm
 {
@@ -26,6 +27,7 @@ namespace ConstraintsSynthesis.Algorithm
             PositivePoints = Points.Where(p => p.Label).ToList();
         }
 
+        [Time("Optimizing sign")]
         public ConstraintLocalOptimization OptimizeSign()
         {
             if (SatisfiedPointsCount * 2 < PositivePoints.Count)
@@ -34,6 +36,7 @@ namespace ConstraintsSynthesis.Algorithm
             return this;
         }
 
+        [Time("Optimizing coefficients")]
         public ConstraintLocalOptimization OptimizeCoefficients()
         {
             while (NotSatisfiedPoints.Count > 0)
@@ -59,6 +62,7 @@ namespace ConstraintsSynthesis.Algorithm
             return this;
         }
 
+        [Time("Squeezing constraints")]
         public ConstraintLocalOptimization SqueezeConstraint()
         {
             var termsToSqueeze = new List<Term>(Constraint.Terms.Keys);

@@ -6,6 +6,7 @@ using Accord.Math;
 using Accord.Statistics.Distributions.Univariate;
 using Accord.Statistics.Filters;
 using ConstraintsSynthesis.Model;
+using MethodTimer;
 
 namespace ConstraintsSynthesis.Algorithm
 {
@@ -22,6 +23,7 @@ namespace ConstraintsSynthesis.Algorithm
             Normalize = normalize;
         }
 
+        [Time("Clustering points")]
         public void Fit(IList<Point> points)
         {
             var clusters = SplitPointsIntoClusters(points, MinK, Normalize);
