@@ -8,9 +8,14 @@ namespace ConstraintsSynthesis.Model
 {
     public class Solution
     {
+        private readonly List<LinearConstraint> _constraints = new List<LinearConstraint>();
+        private readonly List<LinearConstraint> _initialConstraints = new List<LinearConstraint>();
+
         public Cluster Cluster { get; }
-        public List<LinearConstraint> Constraints { get; } = new List<LinearConstraint>();
-        public List<LinearConstraint> InitialConstraints { get; private set; }
+        public IEnumerable<LinearConstraint> Constraints =>
+            _constraints.Select(c => c.Translate(Cluster.Means));
+        public IEnumerable<LinearConstraint> InitialConstraints =>
+            _initialConstraints.Select(c => c.Translate(Cluster.Means));
 
         public Solution(Cluster cluster)
         {
@@ -20,10 +25,10 @@ namespace ConstraintsSynthesis.Model
         [Time("Generating initial constraints")]
         public Solution GenerateInitialSolution()
         {
-            var initialConstraints = InitialSolutionGenerator.GenerateInitialConstraints(Cluster).ToArray();
+            var initialConstraints = InitialSolutionGenerator.GenerateInitialConstraints(Cluster.GetCentralizedCluster()).ToList();
 
-            InitialConstraints = new List<LinearConstraint>(initialConstraints);
-            Constraints.AddRange(initialConstraints);
+            _initialConstraints.AddRange(initialConstraints);
+            _constraints.AddRange(initialConstraints);
 
             return this;
         }
@@ -31,31 +36,32 @@ namespace ConstraintsSynthesis.Model
         [Time("Generating constraints based on initial constraints")]
         public Solution GenerateImprovedInitialConstraints(int iterations = 1)
         {
-            if (InitialConstraints == null)
+            if (_initialConstraints == null)
                 throw new Exception("No initial constraints are generated");
 
             for (var i = 0; i < iterations; i++)
             {
-                foreach (var initialConstraint in InitialConstraints)
+                foreach (var initialConstraint in _initialConstraints)
                 {
                     var newConstraint = initialConstraint.Clone() as LinearConstraint;
-                    var optimizer = new ConstraintLocalOptimization(newConstraint, Cluster);
+                    var optimizer = new ConstraintLocalOptimization(newConstraint, Cluster.GetCentralizedCluster());
 
                     optimizer.SqueezeConstraint();
-                    Constraints.Add(optimizer.Constraint as LinearConstraint);
+                    _constraints.Add(optimizer.Constraint as LinearConstraint);
                 }
             }
 
             return this;
         }
+
         [Time("Generating random constraints")]
-        public Solution GenerateRandomConstraints(int count = 100, bool optimizeSign = true, bool optimizeCoefficients = true, bool squeezeConstraints = true)
+        public Solution GenerateRandomConstraints(int count = 100, bool optimizeSign = true, bool optimizeCoefficients = true, bool squeezeConstraints = false)
         {
-            var randomLinearConstraints = LinearConstraintsGenerator.GenerateRandomLinearConstraints(Cluster, count);
+            var randomLinearConstraints = LinearConstraintsGenerator.GenerateRandomLinearConstraints(Cluster.GetCentralizedCluster(), count);
 
             foreach (var constraint in randomLinearConstraints)
             {
-                var optimizer = new ConstraintLocalOptimization(constraint, Cluster);
+                var optimizer = new ConstraintLocalOptimization(constraint, Cluster.GetCentralizedCluster());
 
                 if (optimizeSign)
                     optimizer.OptimizeSign();
@@ -66,7 +72,7 @@ namespace ConstraintsSynthesis.Model
                 if (squeezeConstraints)
                     optimizer.SqueezeConstraint();
 
-                Constraints.Add(optimizer.Constraint as LinearConstraint);
+                _constraints.Add(optimizer.Constraint as LinearConstraint);
             }
 
             return this;
@@ -83,7 +89,7 @@ namespace ConstraintsSynthesis.Model
 
             foreach (var indexToRemove in redundantIndices)
             {
-                Constraints.RemoveAt(indexToRemove);
+                _constraints.RemoveAt(indexToRemove);
             }
 
             return this;
