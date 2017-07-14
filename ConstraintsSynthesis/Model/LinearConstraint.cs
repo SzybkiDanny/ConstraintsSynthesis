@@ -27,6 +27,18 @@ namespace ConstraintsSynthesis.Model
             AbsoluteTerm = absoluteTerm;
         }
 
+        public LinearConstraint Translate(double[] vector)
+        {
+            var translatedConstraint = Clone() as LinearConstraint;
+
+            for (var i = 0; i < Terms.Count; i++)
+            {
+                translatedConstraint.AbsoluteTerm += this[i]*vector[i];
+            }
+
+            return translatedConstraint;
+        }
+
         public double this[int index]
         {
             get
