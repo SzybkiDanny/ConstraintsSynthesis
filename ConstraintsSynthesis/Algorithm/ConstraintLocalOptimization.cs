@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using ConstraintsSynthesis.Model;
 using MathNet.Numerics.Random;
@@ -8,14 +9,14 @@ namespace ConstraintsSynthesis.Algorithm
 {
     public class ConstraintLocalOptimization
     {
-        private readonly MersenneTwister _random = new MersenneTwister(Program.Seed);
+        private static readonly MersenneTwister Random = new MersenneTwister(Program.Seed);
         private List<Point> PositivePoints { get; }
         private List<Point> NotSatisfiedPoints =>
             PositivePoints.Where(p => !Constraint.IsSatisfying(p)).ToList();
 
         public Constraint Constraint { get; }
         public List<Point> Points { get; }
-        public const double CoefficientOptimizationStep = 0.005;
+        public double MinimalCoefficientOptimizationStep = 0.25;
 
         public int SatisfiedPointsCount =>
             PositivePoints.Count(Constraint.IsSatisfying);
@@ -39,15 +40,18 @@ namespace ConstraintsSynthesis.Algorithm
         [Time("Optimizing coefficients")]
         public ConstraintLocalOptimization OptimizeCoefficients()
         {
+            var stepSign = Constraint.Sign == Inequality.GreaterThanOrEqual ? 1 : -1;
+            var signChanged = false;
+            var step = CalculateCoefficientOptimizationStep();
+
             while (NotSatisfiedPoints.Count > 0)
             {
                 Term selectedTerm = null;
-                var leastNotSatisfiedPoints = int.MaxValue;
-                var stepSign = Constraint.Sign == Inequality.GreaterThanOrEqual ? 1 : -1;
+                var leastNotSatisfiedPoints = NotSatisfiedPoints.Count;
 
                 foreach (var term in Constraint.Terms.Keys.ToList())
                 {
-                    var notSatisfiedPoints = TestCoefficientChange(term, CoefficientOptimizationStep*stepSign);
+                    var notSatisfiedPoints = TestCoefficientChange(term, step*stepSign);
 
                     if (notSatisfiedPoints >= leastNotSatisfiedPoints)
                         continue;
@@ -56,7 +60,27 @@ namespace ConstraintsSynthesis.Algorithm
                     leastNotSatisfiedPoints = notSatisfiedPoints;
                 }
 
-                Constraint[selectedTerm] += CoefficientOptimizationStep*stepSign;
+                if (selectedTerm != null)
+                {
+                    Constraint[selectedTerm] += step*stepSign;
+                    step = CalculateCoefficientOptimizationStep();
+                    signChanged = false;
+                }
+                else if (NotSatisfiedPoints.Count > 0 && !signChanged)
+                {
+                    stepSign *= -1;
+                    signChanged = true;
+                }
+                else if (NotSatisfiedPoints.Count > 0 && signChanged)
+                {
+                    Constraint.AbsoluteTerm += step * (Constraint.Sign == Inequality.GreaterThanOrEqual ? -1 : 1);
+                    signChanged = false;
+                }
+                else
+                {
+                    step *= 2;
+                    signChanged = false;
+                }
             }
 
             return this;
@@ -68,18 +92,18 @@ namespace ConstraintsSynthesis.Algorithm
             var termsToSqueeze = new List<Term>(Constraint.Terms.Keys);
             var stepSign = Constraint.Sign == Inequality.LessThanOrEqual ? 1 : -1;
 
-            Constraint.AbsoluteTerm += 20 * stepSign;
+            Constraint.AbsoluteTerm += 5 * stepSign;
 
             while (termsToSqueeze.Count > 0)
             {
-                var selectedIndex = _random.Next(termsToSqueeze.Count);
+                var selectedIndex = Random.Next(termsToSqueeze.Count);
                 var selectedTerm = termsToSqueeze[selectedIndex];
                 var testResult = TestCoefficientChange(selectedTerm,
-                    CoefficientOptimizationStep*stepSign);
+                    MinimalCoefficientOptimizationStep * stepSign);
 
                 if (testResult == 0)
                 {
-                    Constraint[selectedTerm] += CoefficientOptimizationStep*stepSign;
+                    Constraint[selectedTerm] += MinimalCoefficientOptimizationStep * stepSign;
                 }
                 else
                 {
@@ -92,6 +116,9 @@ namespace ConstraintsSynthesis.Algorithm
 
         private int TestCoefficientChange(Term term, double step)
         {
+            if (term == null)
+                return NotSatisfiedPoints.Count;
+
             Constraint[term] += step;
             var result = NotSatisfiedPoints.Count;
             Constraint[term] -= step;
@@ -99,5 +126,7 @@ namespace ConstraintsSynthesis.Algorithm
             return result;
         }
 
+        private double CalculateCoefficientOptimizationStep() =>
+            Math.Max((double)NotSatisfiedPoints.Count / PositivePoints.Count, MinimalCoefficientOptimizationStep);
     }
 }

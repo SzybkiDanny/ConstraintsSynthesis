@@ -18,7 +18,7 @@ namespace ConstraintsSynthesis.Algorithm
                 var randomPointCoordinates = cluster.Points[Random.Next(cluster.Size)].Coordinates;
                 var coefficients = new double[randomPointCoordinates.Length];
 
-                Normal.Samples(Random, coefficients, 0.0, 1.0);
+                Normal.Samples(Random, coefficients, 0.0, 5);
 
                 var absoluteTerm = randomPointCoordinates.Zip(coefficients, (p, c) => p*c).Sum();
 
