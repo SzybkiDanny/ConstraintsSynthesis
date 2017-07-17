@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using ConstraintsSynthesis.Algorithm;
 using MethodTimer;
 
@@ -16,6 +17,7 @@ namespace ConstraintsSynthesis.Model
             _constraints.Select(c => c.Translate(Cluster.Means));
         public IEnumerable<LinearConstraint> InitialConstraints =>
             _initialConstraints.Select(c => c.Translate(Cluster.Means));
+        public int Index { get; set; }
 
         public Solution(Cluster cluster)
         {
@@ -93,6 +95,20 @@ namespace ConstraintsSynthesis.Model
             }
 
             return this;
+        }
+
+        [Time("Generating readable model")]
+        public StringBuilder GenerateReadableSolution()
+        {
+            var result = new StringBuilder();
+
+            foreach (var constraint in Constraints)
+            {
+                constraint.ConvertToLessThanOrEqual();
+                result.AppendLine($"{constraint} + (1 - b{Index}) * M");
+            }
+
+            return result;
         }
     }
 }
