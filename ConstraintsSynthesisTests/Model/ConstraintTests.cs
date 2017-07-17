@@ -122,7 +122,7 @@ namespace ConstraintsSynthesisTests.Model
             _constraint.Sign = initialSign;
 
             for (var i = 0; i < reversalsCount; i++)
-                _constraint.InvertInequalitySing();
+                _constraint.InvertInequalitySign();
 
             Assert.AreEqual(expectedSign, _constraint.Sign);
         }

@@ -27,8 +27,22 @@ namespace ConstraintsSynthesis.Model
                 ? AbsoluteTerm - ValueForPoint(point)
                 : ValueForPoint(point) - AbsoluteTerm;
 
-        public void InvertInequalitySing() =>
+        public void InvertInequalitySign() =>
             Sign = (Inequality) ((int)(Sign+1) % 2);
+
+        public void ConvertToLessThanOrEqual()
+        {
+            if (Sign == Inequality.LessThanOrEqual)
+                return;
+
+            foreach (var term in Terms.Keys.ToList())
+            {
+                Terms[term] *= -1;
+            }
+
+            Sign = Inequality.LessThanOrEqual;
+            AbsoluteTerm *= -1;
+        }
 
         public override bool Equals(object obj)
         {

@@ -32,7 +32,7 @@ namespace ConstraintsSynthesis.Algorithm
         public ConstraintLocalOptimization OptimizeSign()
         {
             if (SatisfiedPointsCount * 2 < PositivePoints.Count)
-                Constraint.InvertInequalitySing();
+                Constraint.InvertInequalitySign();
 
             return this;
         }
