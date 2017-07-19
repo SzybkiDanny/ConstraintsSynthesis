@@ -6,51 +6,74 @@ namespace ConstraintsSynthesis.Model
 {
     public class ConstraintsSatisfaction
     {
-        private readonly List<Constraint> _constraints;
-        private readonly List<Point> _points;
-        private readonly double[][] _constraintsMargins;
+        public List<Constraint> Constraints { get; set; }
+        public List<Point> Points { get; set; }
+        public List<List<double>> Margins { get; private set; }
+
+        public ConstraintsSatisfaction()
+        {   
+        }
 
         public ConstraintsSatisfaction(List<Constraint> constraints, List<Point> points)
         {
-            _constraints = constraints;
-            _points = points;
+            Constraints = constraints;
+            Points = points;
+        }
 
-            _constraintsMargins = new double[_constraints.Count][];
+        public void CalculateMargins(bool reducePoints = true)
+        {
+            var margins = new List<List<double>>(Points.Count);
 
-            for (var i = 0; i < _constraintsMargins.Length; i++)
+            for (var i = 0; i < Points.Count; i++)
             {
-                _constraintsMargins[i] = new double[_points.Count];
+                var pointMargins = new List<double>(Constraints.Count);
+                var pointSatisfiesAll = true;
+                var pointSatisfiesNone = true;
 
-                for (var j = 0; j < _points.Count; j++)
+                for (var j = 0; j < Constraints.Count; j++)
                 {
-                    _constraintsMargins[i][j] = _constraints[i].MarginForPoint(_points[j]);
+                    var margin = Constraints[j].MarginForPoint(Points[i]);
+
+                    pointMargins.Add(margin);
+
+                    if (margin < 0)
+                        pointSatisfiesAll = false;
+                    else
+                        pointSatisfiesNone = false;
                 }
+
+                if (reducePoints && (pointSatisfiesAll || pointSatisfiesNone))
+                    Points.RemoveAt(i--);
+                else
+                    margins.Add(pointMargins);
             }
+
+            Margins = margins;
         }
 
         public IEnumerable<int> GetSatisfyingPointsIndices(Constraint constraint)
         {
-            var constraintIndex = _constraints.IndexOf(constraint);
+            var constraintIndex = Constraints.IndexOf(constraint);
 
             return GetSatisfyingPointsIndices(constraintIndex);
         }
 
-        public IEnumerable<int> GetUnsatisfyingPointsIndices(Constraint constraint)
+        public IEnumerable<int> GetNotSatisfyingPointsIndices(Constraint constraint)
         {
-            var constraintIndex = _constraints.IndexOf(constraint);
+            var constraintIndex = Constraints.IndexOf(constraint);
 
-            return GetUnsatisfyingPointsIndices(constraintIndex);
+            return GetNotSatisfyingPointsIndices(constraintIndex);
         }
 
         public IEnumerable<int> GetSatisfyingPointsIndices(int constraintIndex) =>
             GetPointsSatisfyingCondition(constraintIndex, m => m >= 0);
 
-        public IEnumerable<int> GetUnsatisfyingPointsIndices(int constraintIndex) =>
+        public IEnumerable<int> GetNotSatisfyingPointsIndices(int constraintIndex) =>
             GetPointsSatisfyingCondition(constraintIndex, m => m < 0);
 
         private IEnumerable<int> GetPointsSatisfyingCondition(int constraintIndex,
             Predicate<double> condition) =>
-                _constraintsMargins[constraintIndex].Select((margin, index) => new {margin, index})
-                    .Where(o => condition(o.margin)).Select(o => o.index);
+                Margins.Select((pointMargins, index) => new { pointIndex = index, margin = pointMargins[constraintIndex]})
+                    .Where(c => condition(c.margin)).Select(o => o.pointIndex);
     }
 }

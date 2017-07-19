@@ -55,17 +55,18 @@ namespace ConstraintsSynthesis.Algorithm
             var similarConstraints = FindSimilarConstraints(constraints, angleSimilarityMarigin);
             var redundant = new List<int>();
             var satisfaction = new ConstraintsSatisfaction(constraints, _randomPoints);
+            satisfaction.CalculateMargins();
 
             foreach (var firstConstraint in similarConstraints)
             {
                 var setUnsatisfiedByFirst =
-                    satisfaction.GetUnsatisfyingPointsIndices(constraints[firstConstraint.Key])
+                    satisfaction.GetNotSatisfyingPointsIndices(constraints[firstConstraint.Key])
                         .ToList();
 
                 foreach (var secondConstraintIndex in firstConstraint.Value)
                 {
                     var setUnsatisfiedBySecond =
-                        satisfaction.GetUnsatisfyingPointsIndices(constraints[secondConstraintIndex])
+                        satisfaction.GetNotSatisfyingPointsIndices(constraints[secondConstraintIndex])
                             .ToList();
 
                     if (setUnsatisfiedByFirst.Except(setUnsatisfiedBySecond).Count()
