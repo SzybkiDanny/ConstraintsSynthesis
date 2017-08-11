@@ -20,7 +20,7 @@ namespace ConstraintsSynthesis.Visualization
             plot.Model = CreatePlotModel();
         }
 
-        private PlotModel CreatePlotModel()
+        private PlotModel CreatePlotModel(bool includeNegativePoints = true)
         {
             var plotModel = new PlotModel
             {
@@ -33,6 +33,9 @@ namespace ConstraintsSynthesis.Visualization
             foreach (var solutionVisualization in _solutionVisualizations)
             {
                 plotModel.Series.Add(solutionVisualization.GetPointsSeriers());
+
+                if (includeNegativePoints)
+                    plotModel.Series.Add(solutionVisualization.GetNegativePointsSeriers());
             }
 
             foreach (

@@ -5,6 +5,7 @@ using Accord.MachineLearning;
 using Accord.Math;
 using Accord.Statistics;
 using Accord.Statistics.Distributions.Multivariate;
+using Accord.Statistics.Distributions.Univariate;
 
 namespace ConstraintsSynthesis.Model
 {
@@ -43,8 +44,9 @@ namespace ConstraintsSynthesis.Model
             {
                 Minimums[i] = points.Min(p => p[i]);
                 Maximums[i] = points.Max(p => p[i]);
-                _multivariateNormalDistribution = new MultivariateNormalDistribution(Means, covariance);
             }
+
+            _multivariateNormalDistribution = new MultivariateNormalDistribution(Means, covariance);
         }
 
 
@@ -59,12 +61,29 @@ namespace ConstraintsSynthesis.Model
             return _centralizedCluster = new Cluster(centralizedPoints);
         }
 
-
         public double LogLikelihood =>
             Points.Sum(p =>
                 _multivariateNormalDistribution.LogProbabilityDensityFunction(p.Coordinates));
 
         public double BIC =>
             -2*LogLikelihood + K*Math.Log(Size);
+
+        public IEnumerable<Point> GenerateNegativePoints(int count = 100)
+        {
+            for (var i = 0; i < count; i++)
+            {
+                double[] point;
+
+                do
+                {
+                    point = _multivariateNormalDistribution.Generate();
+                } while (_multivariateNormalDistribution.Mahalanobis(point) < CalculateThreshold());
+
+                yield return new Point(point) {Label = false};
+            }
+        }
+
+        private double CalculateThreshold(double probability = 0.999) =>
+            Math.Sqrt(ChiSquareDistribution.Inverse(probability, Dimensions));
     }
 }

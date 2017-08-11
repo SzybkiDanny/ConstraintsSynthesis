@@ -31,12 +31,23 @@ namespace ConstraintsSynthesis.Visualization
             Color = GetRandomColor();
         }
 
-        public ScatterSeries GetPointsSeriers()
+        public ScatterSeries GetPointsSeriers(bool includeNegatives = false)
         {
             var clusterPoints = new ScatterSeries {MarkerFill = Color};
 
             clusterPoints.Points.AddRange(
-                Solution.Cluster.Points.Select(
+                Solution.Cluster.Points.Where(p => includeNegatives || p.Label).Select(
+                    p => new ScatterPoint(p[XIndex], p[YIndex], 2)));
+
+            return clusterPoints;
+        }
+
+        public ScatterSeries GetNegativePointsSeriers()
+        {
+            var clusterPoints = new ScatterSeries { MarkerFill =  OxyColor.Interpolate(Color, OxyColor.FromRgb(0,0,0), 0.5)};
+
+            clusterPoints.Points.AddRange(
+                Solution.Cluster.Points.Where(p => !p.Label).Select(
                     p => new ScatterPoint(p[XIndex], p[YIndex], 2)));
 
             return clusterPoints;

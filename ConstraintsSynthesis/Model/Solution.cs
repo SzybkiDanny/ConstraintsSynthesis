@@ -110,5 +110,15 @@ namespace ConstraintsSynthesis.Model
 
             return result;
         }
+
+        [Time("Generating negative points")]
+        public Solution GenerateNegativePoints(int count = 1000)
+        {
+            var negativePoints = Cluster.GenerateNegativePoints(count);
+
+            Cluster.Points.AddRange(negativePoints);
+            
+            return this;
+        }
     }
 }
