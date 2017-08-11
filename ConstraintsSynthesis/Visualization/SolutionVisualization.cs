@@ -53,7 +53,7 @@ namespace ConstraintsSynthesis.Visualization
             return clusterPoints;
         }
 
-        public IEnumerable<Series> GetConstraintsSeries(bool skipIrrelevant = true, bool trimConstraints = true, double additionalMarginSize = 0.1)
+        public IEnumerable<Series> GetConstraintsSeries(bool skipIrrelevant = false, bool trimConstraints = true, double additionalMarginSize = 0.1)
         {
             foreach (var constraint in Solution.Constraints)
             {
