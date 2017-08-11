@@ -1,0 +1,132 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ExperimentDatabase</name>
+    </assembly>
+    <members>
+        <member name="F:ExperimentDatabase.Database.columns">
+            <summary>
+            Columns cache
+            </summary>
+            <typeparam name="string"></typeparam>
+            <typeparam name="TreeSet"></typeparam>
+            <param name=""></param>
+            <param name=""></param>
+            <returns></returns>
+        </member>
+        <member name="F:ExperimentDatabase.Database.closed">
+            Closed flag.
+        </member>
+        <member name="M:ExperimentDatabase.Database.#ctor(System.String)">
+            <summary>
+            Initializes new instance of experiment database
+            </summary>
+            <param name="databaseFilename"></param>
+        </member>
+        <member name="M:ExperimentDatabase.Database.PrepareSchema">
+            <summary>
+            Creates database schema.
+            </summary>
+        </member>
+        <member name="M:ExperimentDatabase.Database.GetColumnInfo(System.String)">
+            <summary>
+            Gets list of columns in a given table.
+            </summary>
+            <param name="table"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ExperimentDatabase.Database.CheckClosed">
+            <summary>
+            Checks if the database object is closed. If so, then an exception is thrown.
+            </summary>
+        </member>
+        <member name="M:ExperimentDatabase.Database.EnsureColumns(ExperimentDatabase.DataSet)">
+            <summary>
+            Makes sure that a tables contains columns from a given set. If not, then the columns are created.
+            </summary>
+            <param name="set"></param>
+        </member>
+        <member name="M:ExperimentDatabase.Database.BuildInsertStatement(ExperimentDatabase.DataSet)">
+            <summary>
+            Builds insert statement for a given table and dictionary of values. The statement is created in INSERT OR REPLACE
+            mode, so if the value collection contains primary key, that is already occupied, than the entire tuple is being
+            replaced, in effect if statement execution.
+            </summary>
+            <param name="set"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ExperimentDatabase.Database.WriteData(ExperimentDatabase.DataSet)">
+            <summary>
+            Writes the given values to the given table. Each key in the values dictionary refers the the column name and
+            value refers to the tuple value.If values dictionary contains primary key and such a key is already occupied in
+            database, then such a tuple is being completely replaced by the given values.
+            </summary>
+            <param name="set"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ExperimentDatabase.Database.NewExperiment">
+            <summary>
+            Initializes new instance of experiment, associated with this database. The experiment is not materialized in
+            database until explicit call of Experiment.save or Experiment.close.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:ExperimentDatabase.Database.Dispose">
+            <summary>
+            Closes database object. It will become useless after this call. The current transaction is being rolled back.
+            </summary>
+        </member>
+        <member name="F:ExperimentDatabase.DatabaseEngine.currentTransactionLevel">
+            <summary>
+            Level of current transaction (in other words a size of transaction stack).
+            </summary>
+        </member>
+        <member name="M:ExperimentDatabase.DatabaseEngine.BeginTransaction">
+            <summary>
+            Begins database transaction. The subsequent calls to this method increase the level of transactions stack, i.e.
+            nested transactions are supported.However the data is guaranteed to be committed to disk, only if the outer most
+            transaction is committed.The roll backs of outer transactions also roll back the nested transactions.
+            </summary>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:ExperimentDatabase.DatabaseEngine.Commit" -->
+        <!-- Badly formed XML comment ignored for member "M:ExperimentDatabase.DatabaseEngine.Rollback" -->
+        <member name="M:ExperimentDatabase.DataSet.#ctor(System.String,ExperimentDatabase.DataSet,ExperimentDatabase.Database)">
+            <summary>
+            
+            </summary>
+            <param name="name"></param>
+            <param name="parent">Null means no parent</param>
+            <param name="database"></param>
+        </member>
+        <member name="M:ExperimentDatabase.DataSet.CheckClosed">
+            <summary>
+            Checks if the object is closed
+            </summary>
+        </member>
+        <member name="M:ExperimentDatabase.DataSet.Dispose">
+            <summary>
+            Stores the current state of the object in database and closes it. Once the object is closed, it becomes useless,
+            since all calls to the object's methods will throw DatabaseException.
+            </summary>
+        </member>
+        <member name="M:ExperimentDatabase.Helpers.FixDataObjectName(System.String)">
+            <summary>
+            Removes possibly insecure characters from a given name, such that '`"\. and filters the data object name for
+            restricted names(currently "id", "parent" or "sqlite_*"). If a restricted name is given, then it becomes
+            prefixed by _(underscore).
+            </summary>
+            <param name="name"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Modeling.Statistics.Extensions.IExtension">
+            <summary>
+            Interface for database extensions, e.g. new functions.
+            </summary>
+        </member>
+        <member name="P:Modeling.Statistics.Extensions.IExtension.Name">
+            <summary>
+            Name of extensions function
+            </summary>
+        </member>
+    </members>
+</doc>
