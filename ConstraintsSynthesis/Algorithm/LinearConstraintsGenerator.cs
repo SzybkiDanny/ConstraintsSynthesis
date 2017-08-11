@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using ConstraintsSynthesis.Model;
 using MathNet.Numerics.Distributions;
@@ -23,6 +24,31 @@ namespace ConstraintsSynthesis.Algorithm
                 var absoluteTerm = randomPointCoordinates.Zip(coefficients, (p, c) => p*c).Sum();
 
                 yield return new LinearConstraint(coefficients, absoluteTerm);
+            }
+        }
+
+        public static IEnumerable<LinearConstraint> GenerateRandomLinearConstraintsCrossingOrigin(Cluster cluster,
+            int constraintsCount)
+        {
+            for (var i = 0; i < constraintsCount; i++)
+            {
+                var randomPointCoordinates = cluster.Points[Random.Next(cluster.Size)].Coordinates;
+                var coefficients = new double[randomPointCoordinates.Length];
+
+                coefficients[0] = Normal.Sample(Random, 0.0, 5);
+
+                for (var j = 1; j < coefficients.Length - 1; j++)
+                {
+                    var deviation = randomPointCoordinates.Zip(coefficients, (p, c) => p * c).Sum();
+
+                    coefficients[i] = Normal.Sample(Random, -deviation, Math.Abs(deviation) / (3 * randomPointCoordinates[i]));
+                }
+
+                coefficients[coefficients.Length - 1] =
+                    -randomPointCoordinates.Zip(coefficients, (p, c) => p * c).Sum() /
+                    randomPointCoordinates[coefficients.Length - 1];
+
+                yield return new LinearConstraint(coefficients, 0);
             }
         }
     }
