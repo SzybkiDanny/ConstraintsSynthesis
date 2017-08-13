@@ -6,6 +6,7 @@ using Accord.Math;
 using Accord.Statistics;
 using Accord.Statistics.Distributions.Multivariate;
 using Accord.Statistics.Distributions.Univariate;
+using MathNet.Numerics.Random;
 
 namespace ConstraintsSynthesis.Model
 {
@@ -14,6 +15,7 @@ namespace ConstraintsSynthesis.Model
         private readonly MultivariateNormalDistribution _multivariateNormalDistribution;
         public readonly int K;
         private Cluster _centralizedCluster;
+        private readonly MersenneTwister _random = new MersenneTwister(Program.Seed);
 
         public int Size => Points.Count;
         public List<Point> Points { get; }
@@ -59,6 +61,34 @@ namespace ConstraintsSynthesis.Model
                 Points.Select(p => new Point(p.Coordinates.Subtract(Means)) {Label = p.Label}).ToList();
 
             return _centralizedCluster = new Cluster(centralizedPoints);
+        }
+
+        public List<Point> GenerateRandomPointsAroundCluster(int pointsCount = 10000, double marginExpansion = 0.5)
+        {
+            var randomPoints = new List<Point>(pointsCount);
+
+            var ranges = Maximums.Zip(Minimums,
+                (max, min) => max - min).ToArray();
+            var minimums =
+                Minimums.Select((m, i) => m - ranges[i] * marginExpansion).ToArray();
+            var maximums =
+                Maximums.Select((m, i) => m + ranges[i] * marginExpansion).ToArray();
+            var dimensions = Dimensions;
+
+            for (var i = 0; i < pointsCount; i++)
+            {
+                var pointCoordinates = _random.NextDoubles(dimensions);
+
+                for (var j = 0; j < dimensions; j++)
+                {
+                    pointCoordinates[j] = minimums[j] +
+                                          pointCoordinates[j] * (maximums[j] - minimums[j]);
+                }
+
+                randomPoints.Add(new Point(pointCoordinates));
+            }
+
+            return randomPoints;
         }
 
         public double LogLikelihood =>

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using ConstraintsSynthesis.Algorithm;
 using MethodTimer;
+using ConstraintMetric = ConstraintsSynthesis.Model.Enums.ConstraintMetric;
 
 namespace ConstraintsSynthesis.Model
 {
@@ -81,17 +82,52 @@ namespace ConstraintsSynthesis.Model
         }
 
         [Time("Removing redundant constraints")]
-        public Solution RemoveRedundantConstraints(int samplingSize = 100)
+        public Solution RemoveRedundantConstraints(ConstraintMetric constraintMetric = ConstraintMetric.DistanceFromMeans, int samplingSize = 100,
+            double marginExpansion = 0.5, double angleSimilarityMarigin = 5.0, bool reduceSatisfiedPoints = true)
         {
-            var redundantConstraintsFinder = new RedundantConstraintsFinder(this, samplingSize, 0.0);
-            var redundantIndices = redundantConstraintsFinder.FindRedundantConstraints();
+            var randomPoints = Cluster.GenerateRandomPointsAroundCluster(samplingSize, marginExpansion);
+            Func<Constraint, double> constraintUtilityFunction = null;
+            var constraints = Constraints.Cast<Constraint>().ToList();
+
+
+            switch (constraintMetric)
+            {
+                case ConstraintMetric.DistanceFromCentroid:
+                    constraintUtilityFunction =
+                        c => Algorithm.ConstraintMetric.DistanceFromCentroid(c, new Point(Cluster.Centroid));
+                    break;
+                case ConstraintMetric.DistanceFromMeans:
+                    constraintUtilityFunction =
+                        c => Algorithm.ConstraintMetric.DistanceFromMeans(c, new Point(Cluster.Means));
+                    break;
+                case ConstraintMetric.DistanceFromSatisfied:
+                    constraintUtilityFunction =
+                        c => Algorithm.ConstraintMetric.DistanceFromSatisfied(c, randomPoints);
+                    break;
+                case ConstraintMetric.DistanceFromUnsatisfied:
+                    constraintUtilityFunction =
+                        c => Algorithm.ConstraintMetric.DistanceFromUnsatisfied(c, randomPoints);
+                    break;
+                case ConstraintMetric.AvgDistanceFromSatisfied:
+                    constraintUtilityFunction =
+                        c => Algorithm.ConstraintMetric.AvgDistanceFromSatisfied(c, randomPoints);
+                    break;
+                case ConstraintMetric.AvgDistanceFromUnsatisfied:
+                    constraintUtilityFunction =
+                        c => Algorithm.ConstraintMetric.AvgDistanceFromUnsatisfied(c, randomPoints);
+                    break;
+            }
+
+            var redundantIndices =
+                RedundantConstraintsFinder.FindRedundantConstraints(constraintUtilityFunction, constraints, randomPoints,
+                    angleSimilarityMarigin, reduceSatisfiedPoints).ToList();
 
             redundantIndices.Sort();
             redundantIndices.Reverse();
 
             foreach (var indexToRemove in redundantIndices)
             {
-                _constraints.RemoveAt(indexToRemove);
+                _constraints[indexToRemove].IsMarkedRedundant = true;
             }
 
             return this;

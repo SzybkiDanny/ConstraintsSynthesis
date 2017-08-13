@@ -53,10 +53,14 @@ namespace ConstraintsSynthesis.Visualization
             return clusterPoints;
         }
 
-        public IEnumerable<Series> GetConstraintsSeries(bool skipIrrelevant = false, bool trimConstraints = true, double additionalMarginSize = 0.1)
+        public IEnumerable<Series> GetConstraintsSeries(bool skipIrrelevant = false, bool trimConstraints = true, double additionalMarginSize = 0.4)
         {
             foreach (var constraint in Solution.Constraints)
             {
+                var constraintColor = constraint.IsMarkedRedundant
+                    ? OxyColor.FromAColor(30, Color)
+                    : Color;
+
                 if (Math.Abs(constraint[YIndex]) > double.Epsilon)
                 {
                     var minX = MinX;
@@ -103,13 +107,13 @@ namespace ConstraintsSynthesis.Visualization
                     var constraintLine =
                         new FunctionSeries(
                             x => (-constraint[XIndex] * x + constraint.AbsoluteTerm) / constraint[YIndex],
-                            minX - plotMargin, maxX + plotMargin, 2) { Color = Color};
+                            minX - plotMargin, maxX + plotMargin, 2) { Color = constraintColor};
 
                     yield return constraintLine;
                 }
                 else if (Math.Abs(constraint[XIndex]) > double.Epsilon)
                 {
-                    var lineSeriers = new LineSeries() {Color = Color};
+                    var lineSeriers = new LineSeries() {Color = constraintColor};
 
                     lineSeriers.Points.AddRange(new []
                     {

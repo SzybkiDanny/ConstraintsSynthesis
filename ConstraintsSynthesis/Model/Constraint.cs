@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Accord.Math;
 
 namespace ConstraintsSynthesis.Model
 {
@@ -9,6 +10,7 @@ namespace ConstraintsSynthesis.Model
         public Dictionary<Term, double> Terms { get; } = new Dictionary<Term, double>();
         public double AbsoluteTerm { get; set; } = 1;
         public Inequality Sign { get; set; } = Inequality.LessThanOrEqual;
+        public bool IsMarkedRedundant { get; set; }
 
         public double this[Term index]
         {
@@ -26,6 +28,9 @@ namespace ConstraintsSynthesis.Model
             Sign == Inequality.LessThanOrEqual
                 ? AbsoluteTerm - ValueForPoint(point)
                 : ValueForPoint(point) - AbsoluteTerm;
+
+        public double DistanceFromPoint(Point point) =>
+            Math.Abs(ValueForPoint(point) + AbsoluteTerm) * Terms.Values.ToArray().Dot(Terms.Values.ToArray());
 
         public void InvertInequalitySign() =>
             Sign = (Inequality) ((int)(Sign+1) % 2);
@@ -70,7 +75,11 @@ namespace ConstraintsSynthesis.Model
 
         public virtual object Clone()
         {
-            var clonedConstrained = new Constraint() {AbsoluteTerm = AbsoluteTerm, Sign = Sign};
+            var clonedConstrained = new Constraint() {
+                AbsoluteTerm = AbsoluteTerm,
+                Sign = Sign,
+                IsMarkedRedundant = IsMarkedRedundant
+            };
 
             foreach (var term in Terms)
             {

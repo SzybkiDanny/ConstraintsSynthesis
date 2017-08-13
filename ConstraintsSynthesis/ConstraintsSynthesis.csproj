@@ -158,11 +158,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Algorithm\ConstraintMetric.cs" />
     <Compile Include="Algorithm\LinearConstraintsGenerator.cs" />
     <Compile Include="Algorithm\InitialSolutionGenerator.cs" />
     <Compile Include="Algorithm\ConstraintLocalOptimization.cs" />
     <Compile Include="Algorithm\RedundantConstraintsFinder.cs" />
     <Compile Include="Algorithm\XMeans.cs" />
+    <Compile Include="Model\ConstraintMetric.cs" />
     <Compile Include="TimeLogLevel.cs" />
     <Compile Include="MethodTimeLogger.cs" />
     <Compile Include="Model\Cluster.cs" />

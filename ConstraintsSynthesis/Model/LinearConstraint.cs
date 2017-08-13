@@ -51,7 +51,11 @@ namespace ConstraintsSynthesis.Model
 
         public override object Clone()
         {
-            return new LinearConstraint(Terms.Values.ToArray(), AbsoluteTerm) {Sign = Sign};
+            return new LinearConstraint(Terms.Values.ToArray(), AbsoluteTerm)
+            {
+                Sign = Sign,
+                IsMarkedRedundant = IsMarkedRedundant
+            };
         }
     }
 }
