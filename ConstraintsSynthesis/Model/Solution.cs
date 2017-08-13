@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using ConstraintsSynthesis.Algorithm;
+using ConstraintsSynthesis.Model.Enums;
 using MethodTimer;
 using ConstraintMetric = ConstraintsSynthesis.Model.Enums.ConstraintMetric;
 
@@ -58,9 +59,23 @@ namespace ConstraintsSynthesis.Model
         }
 
         [Time("Generating random constraints")]
-        public Solution GenerateRandomConstraints(int count = 100, bool optimizeSign = true, bool optimizeCoefficients = true, bool squeezeConstraints = false)
+        public Solution GenerateRandomConstraints(
+            ConstraintsGeneration constraintsGeneration = ConstraintsGeneration.CrossingRandomPoint, int count = 100,
+            bool optimizeSign = true, bool optimizeCoefficients = true)
         {
-            var randomLinearConstraints = LinearConstraintsGenerator.GenerateRandomLinearConstraints(Cluster.GetCentralizedCluster(), count);
+            Func<Cluster, int, IEnumerable<LinearConstraint>> generationMethod = null;
+
+            switch (constraintsGeneration)
+            {
+                case ConstraintsGeneration.CrossingRandomPoint:
+                    generationMethod = LinearConstraintsGenerator.GenerateRandomLinearConstraints;
+                    break;
+                case ConstraintsGeneration.CrossingRandomPointAndOrigin:
+                    generationMethod = LinearConstraintsGenerator.GenerateRandomLinearConstraintsCrossingOrigin;
+                    break;
+            }
+
+            var randomLinearConstraints = generationMethod(Cluster.GetCentralizedCluster(), count);
 
             foreach (var constraint in randomLinearConstraints)
             {
@@ -68,12 +83,9 @@ namespace ConstraintsSynthesis.Model
 
                 if (optimizeSign)
                     optimizer.OptimizeSign();
-                
+
                 if (optimizeCoefficients)
                     optimizer.OptimizeCoefficients();
-
-                if (squeezeConstraints)
-                    optimizer.SqueezeConstraint();
 
                 _constraints.Add(optimizer.Constraint as LinearConstraint);
             }
