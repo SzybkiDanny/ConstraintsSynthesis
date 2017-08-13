@@ -164,7 +164,8 @@
     <Compile Include="Algorithm\ConstraintLocalOptimization.cs" />
     <Compile Include="Algorithm\RedundantConstraintsFinder.cs" />
     <Compile Include="Algorithm\XMeans.cs" />
-    <Compile Include="Model\ConstraintMetric.cs" />
+    <Compile Include="Model\Enums\ConstraintMetric.cs" />
+    <Compile Include="Model\Enums\ConstraintsGeneration.cs" />
     <Compile Include="TimeLogLevel.cs" />
     <Compile Include="MethodTimeLogger.cs" />
     <Compile Include="Model\Cluster.cs" />
