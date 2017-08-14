@@ -25,7 +25,7 @@ namespace ConstraintsSynthesis.Algorithm
                     distance += constraint.DistanceFromPoint(randomPoint);
             }
 
-            return distance;
+            return -distance;
         }
 
         public static double DistanceFromSatisfied(Constraint constraint, List<Point> randomPoints)
@@ -55,7 +55,7 @@ namespace ConstraintsSynthesis.Algorithm
                 }
             }
 
-            return distance / count;
+            return -distance / count;
         }
 
         public static double AvgDistanceFromSatisfied(Constraint constraint, List<Point> randomPoints)
