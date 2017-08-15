@@ -17,8 +17,9 @@ namespace ConstraintsSynthesis.Model
         private Cluster _centralizedCluster;
         private readonly MersenneTwister _random = new MersenneTwister(Program.Seed);
 
-        public int Size => Points.Count;
+        public int Size => PositivePoints.Count;
         public List<Point> Points { get; }
+        public List<Point> PositivePoints => Points.Where(p => p.Label).ToList();
         public double[] Centroid { get; }
         public double[][] Covariance { get; }
         public double[] Minimums { get; }
@@ -58,7 +59,7 @@ namespace ConstraintsSynthesis.Model
                 return _centralizedCluster;
 
             var centralizedPoints =
-                Points.Select(p => new Point(p.Coordinates.Subtract(Means)) {Label = p.Label}).ToList();
+                PositivePoints.Select(p => new Point(p.Coordinates.Subtract(Means)) {Label = p.Label}).ToList();
 
             return _centralizedCluster = new Cluster(centralizedPoints);
         }
@@ -92,13 +93,13 @@ namespace ConstraintsSynthesis.Model
         }
 
         public double LogLikelihood =>
-            Points.Sum(p =>
+            PositivePoints.Sum(p =>
                 _multivariateNormalDistribution.LogProbabilityDensityFunction(p.Coordinates));
 
         public double BIC =>
             -2*LogLikelihood + K*Math.Log(Size);
 
-        public IEnumerable<Point> GenerateNegativePoints(int count = 100)
+        public IEnumerable<Point> GenerateNegativePointsFromPositivesDistribution(double probability, int count = 100)
         {
             for (var i = 0; i < count; i++)
             {
@@ -107,13 +108,13 @@ namespace ConstraintsSynthesis.Model
                 do
                 {
                     point = _multivariateNormalDistribution.Generate();
-                } while (_multivariateNormalDistribution.Mahalanobis(point) < CalculateThreshold());
+                } while (_multivariateNormalDistribution.Mahalanobis(point) < CalculateThreshold(probability));
 
                 yield return new Point(point) {Label = false};
             }
         }
 
-        private double CalculateThreshold(double probability = 0.999) =>
-            Math.Sqrt(ChiSquareDistribution.Inverse(probability, Dimensions));
+        private double CalculateThreshold(double probability) =>
+            Math.Sqrt(ChiSquareDistribution.Inverse(1 - probability, Dimensions));
     }
 }
