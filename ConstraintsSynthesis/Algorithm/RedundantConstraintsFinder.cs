@@ -13,10 +13,21 @@ namespace ConstraintsSynthesis.Algorithm
         {
             var redundantConstraints = new HashSet<int>();
             var similarConstraints = FindSimilarConstraints(constraints, angleSimilarityMarigin);
-            new ConstraintsSatisfaction(constraints, randomPoints).CalculateMargins(reduceSatisfiedPoints);
+            var constraintsSatisfaction = new ConstraintsSatisfaction(constraints, randomPoints);
+            constraintsSatisfaction.CalculateMargins(reduceSatisfiedPoints);
+
+            var allUnsatisfiedPoints = new HashSet<int>();
 
             foreach (var firstConstraint in similarConstraints)
             {
+                var unsatisfiedPoints = constraintsSatisfaction.GetNotSatisfyingPointsIndices(firstConstraint.Key);
+
+                if (allUnsatisfiedPoints.IsSupersetOf(unsatisfiedPoints))
+                {
+                    redundantConstraints.Add(firstConstraint.Key);
+                    continue;
+                }
+
                 var bestConstraint = firstConstraint.Key;
                 var distanctFromBest = constraintUtilityMetric(constraints[bestConstraint]);
 
@@ -35,6 +46,7 @@ namespace ConstraintsSynthesis.Algorithm
                     }
                 }
 
+                allUnsatisfiedPoints.UnionWith(constraintsSatisfaction.GetNotSatisfyingPointsIndices(bestConstraint));
                 redundantConstraints.Remove(bestConstraint);
             }
 
@@ -53,7 +65,7 @@ namespace ConstraintsSynthesis.Algorithm
 
                 for (var j = 0; j < constraints.Count; j++)
                 {
-                    if (j == i)
+                    if (j == i || constraints[i].Sign != constraints[j].Sign)
                         continue;
 
                     var secondConstraintCoefficients = constraints[j].Terms.Values.ToArray();
