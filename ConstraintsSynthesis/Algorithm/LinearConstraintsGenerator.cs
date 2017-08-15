@@ -19,7 +19,7 @@ namespace ConstraintsSynthesis.Algorithm
                 var randomPointCoordinates = cluster.Points[Random.Next(cluster.Size)].Coordinates;
                 var coefficients = new double[randomPointCoordinates.Length];
 
-                Normal.Samples(Random, coefficients, 0.0, 5);
+                Normal.Samples(Random, coefficients, 0.0, 15);
 
                 var absoluteTerm = randomPointCoordinates.Zip(coefficients, (p, c) => p*c).Sum();
 
@@ -48,7 +48,9 @@ namespace ConstraintsSynthesis.Algorithm
                     -randomPointCoordinates.Zip(coefficients, (p, c) => p * c).Sum() /
                     randomPointCoordinates[coefficients.Length - 1];
 
-                yield return new LinearConstraint(coefficients, 0);
+                var sign = Random.Next(2);
+
+                yield return new LinearConstraint(coefficients, 0) {Sign = (Inequality)sign};
             }
         }
     }
