@@ -8,5 +8,6 @@
         DistanceFromUnsatisfied,
         AvgDistanceFromSatisfied,
         AvgDistanceFromUnsatisfied,
+        MostUnsatisfied
     }
 }

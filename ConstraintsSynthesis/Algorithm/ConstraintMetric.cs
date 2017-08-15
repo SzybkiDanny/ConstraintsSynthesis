@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using ConstraintsSynthesis.Model;
 
 namespace ConstraintsSynthesis.Algorithm
@@ -74,5 +75,8 @@ namespace ConstraintsSynthesis.Algorithm
 
             return distance / count;
         }
+
+        public static double MostUnsatisfied(Constraint constraint, List<Point> randomPoints) =>
+            -randomPoints.Count(p => !constraint.IsSatisfying(p));
     }
 }

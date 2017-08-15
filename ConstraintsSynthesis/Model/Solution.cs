@@ -128,6 +128,12 @@ namespace ConstraintsSynthesis.Model
                     constraintUtilityFunction =
                         c => Algorithm.ConstraintMetric.AvgDistanceFromUnsatisfied(c, randomPoints);
                     break;
+                case ConstraintMetric.MostUnsatisfied:
+                    constraintUtilityFunction =
+                        c => Algorithm.ConstraintMetric.MostUnsatisfied(c, randomPoints);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(constraintMetric), constraintMetric, null);
             }
 
             var redundantIndices =
@@ -159,10 +165,10 @@ namespace ConstraintsSynthesis.Model
             return result;
         }
 
-        [Time("Generating negative points")]
-        public Solution GenerateNegativePoints(int count = 1000)
+        [Time("Generating negative points from cluster's points distribution")]
+        public Solution GenerateNegativePointsFromClusterDistribution(double probability = 0.001, int count = 1000)
         {
-            var negativePoints = Cluster.GenerateNegativePoints(count);
+            var negativePoints = Cluster.GenerateNegativePointsFromPositivesDistribution(probability, count);
 
             Cluster.Points.AddRange(negativePoints);
             
