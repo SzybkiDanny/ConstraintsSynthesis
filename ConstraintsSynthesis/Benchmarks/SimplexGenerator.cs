@@ -26,7 +26,6 @@ namespace ConstraintsSynthesis.Benchmarks
 
                 _uniformDistribution.Samples(samples);
 
-
                 if (samples.Sum() > d)
                     continue;
 
@@ -53,27 +52,10 @@ namespace ConstraintsSynthesis.Benchmarks
             while (generatedNegatives < negatives)
             {
                 var samples = new double[dimensions];
-                var isNegative = false;
 
                 _uniformDistribution.Samples(samples);
 
                 if (samples.Sum() < d)
-                    continue;
-
-                for (var i = 1; i <= dimensions; i++)
-                {
-                    for (int j = i + 1; j < dimensions; j++)
-                    {
-                        if (samples[i - 1] / Math.Tan(Math.PI / 12) - samples[j - 1] * Math.Tan(Math.PI / 12) < 0 ||
-                            samples[j - 1] / Math.Tan(Math.PI / 12) - samples[i - 1] * Math.Tan(Math.PI / 12) < 0)
-                        {
-                            isNegative = true;
-                            break;
-                        }
-                    }
-                }
-
-                if (!isNegative)
                     continue;
 
                 generatedNegatives++;
