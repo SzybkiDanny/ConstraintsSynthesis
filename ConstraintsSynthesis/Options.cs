@@ -93,7 +93,7 @@ namespace ConstraintsSynthesis
             HelpText = "Quantile to be used for negative points generation.")]
         public double Quantile { get; set; }
 
-        [Option("generatedNegativesSetSize", DefaultValue = 1000, Required = false,
+        [Option("generatedNegativesSetSize", DefaultValue = 0, Required = false,
             HelpText = "Size of randomly generated set of negative points.")]
         public int GeneratedNegativesSetSize { get; set; }
 
