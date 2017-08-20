@@ -170,6 +170,7 @@
     <Compile Include="Benchmarks\CubeGenerator.cs" />
     <Compile Include="Model\Enums\ConstraintMetric.cs" />
     <Compile Include="Model\Enums\ConstraintsGeneration.cs" />
+    <Compile Include="Parameters.cs" />
     <Compile Include="TimeLogLevel.cs" />
     <Compile Include="MethodTimeLogger.cs" />
     <Compile Include="Model\Cluster.cs" />
