@@ -94,7 +94,7 @@ namespace ConstraintsSynthesis.Model
         }
 
         [Time("Removing redundant constraints")]
-        public Solution RemoveRedundantConstraints(ConstraintMetric constraintMetric = ConstraintMetric.DistanceFromMeans, int samplingSize = 100,
+        public Solution RemoveRedundantConstraints(ConstraintMetric constraintMetric = ConstraintMetric.MostUnsatisfied, int samplingSize = 100,
             double marginExpansion = 0.5, double angleSimilarityMarigin = 5.0, bool reduceSatisfiedPoints = true)
         {
             var randomPoints = Cluster.GenerateRandomPointsAroundCluster(samplingSize, marginExpansion);
