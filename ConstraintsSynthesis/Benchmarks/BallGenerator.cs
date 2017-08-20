@@ -7,19 +7,19 @@ using MathNet.Numerics.Distributions;
 
 namespace ConstraintsSynthesis.Benchmarks
 {
-    public class BallGenerator
+    public class BallGenerator : BenchmarkGenerator
     {
         private ContinuousUniform _uniformDistributionForPositives;
         private ContinuousUniform _uniformDistributionForNegatives;
 
-        public IList<Point> Generate(int dimensions, double d, int positives, int negatives = 0)
+        public override IList<Point> Generate(int dimensions, double d, int positives, int negatives = 0)
         {
             var result = new List<Point>(positives + negatives);
             var generatedPositives = 0;
             var generatedNegatives = 0;
 
-            _uniformDistributionForPositives = new ContinuousUniform(1 - d, d + dimensions);
-            _uniformDistributionForNegatives = new ContinuousUniform(1 - 2 * d, dimensions + 2 * d);
+            _uniformDistributionForPositives = new ContinuousUniform(1 - d, d + dimensions, RandomSource);
+            _uniformDistributionForNegatives = new ContinuousUniform(1 - 2 * d, dimensions + 2 * d, RandomSource);
 
             while (generatedPositives < positives)
             {

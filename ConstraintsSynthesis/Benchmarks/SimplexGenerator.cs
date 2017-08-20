@@ -6,17 +6,17 @@ using MathNet.Numerics.Distributions;
 
 namespace ConstraintsSynthesis.Benchmarks
 {
-    public class SimplexGenerator
+    public class SimplexGenerator : BenchmarkGenerator
     {
         private ContinuousUniform _uniformDistribution;
 
-        public IList<Point> Generate(int dimensions, double d, int positives, int negatives = 0)
+        public override IList<Point> Generate(int dimensions, double d, int positives, int negatives = 0)
         {
             var result = new List<Point>(positives + negatives);
             var generatedPositives = 0;
             var generatedNegatives = 0;
 
-            _uniformDistribution = new ContinuousUniform(-1, 2 + d);
+            _uniformDistribution = new ContinuousUniform(-1, 2 + d, RandomSource);
 
 
             while (generatedPositives < positives)

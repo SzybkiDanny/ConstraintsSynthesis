@@ -164,6 +164,7 @@
     <Compile Include="Algorithm\ConstraintLocalOptimization.cs" />
     <Compile Include="Algorithm\RedundantConstraintsFinder.cs" />
     <Compile Include="Algorithm\XMeans.cs" />
+    <Compile Include="Benchmarks\BenchmarkGenerator.cs" />
     <Compile Include="Benchmarks\SimplexGenerator.cs" />
     <Compile Include="Benchmarks\BallGenerator.cs" />
     <Compile Include="Benchmarks\CubeGenerator.cs" />

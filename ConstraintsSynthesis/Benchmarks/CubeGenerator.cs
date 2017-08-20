@@ -4,19 +4,19 @@ using MathNet.Numerics.Distributions;
 
 namespace ConstraintsSynthesis.Benchmarks
 {
-    public class CubeGenerator
+    public class CubeGenerator : BenchmarkGenerator
     {
         private ContinuousUniform _uniformDistributionForPositives;
         private ContinuousUniform _uniformDistributionForNegatives;
 
-        public IList<Point> Generate(int dimensions, double d, int positives, int negatives = 0)
+        public override IList<Point> Generate(int dimensions, double d, int positives, int negatives = 0)
         {
             var result = new List<Point>(positives + negatives);
             var generatedPositives = 0;
             var generatedNegatives = 0;
 
-            _uniformDistributionForPositives = new ContinuousUniform(1, dimensions + dimensions * d);
-            _uniformDistributionForNegatives = new ContinuousUniform(dimensions - dimensions * d, dimensions + 2 * dimensions * d);
+            _uniformDistributionForPositives = new ContinuousUniform(1, dimensions + dimensions * d, RandomSource);
+            _uniformDistributionForNegatives = new ContinuousUniform(dimensions - dimensions * d, dimensions + 2 * dimensions * d, RandomSource);
 
             while (generatedPositives < positives)
             {
