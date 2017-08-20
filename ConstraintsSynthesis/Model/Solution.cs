@@ -152,17 +152,19 @@ namespace ConstraintsSynthesis.Model
         }
 
         [Time("Generating readable model")]
-        public StringBuilder GenerateReadableSolution()
+        public Solution GenerateReadableSolution(out string[] readableSolution)
         {
-            var result = new StringBuilder();
+            var result = new List<string>();
 
             foreach (var constraint in Constraints)
             {
                 constraint.ConvertToLessThanOrEqual();
-                result.AppendLine($"{constraint} + (1 - b{Index}) * M");
+                result.Add($"{constraint} + (1 - b{Index}) * M");
             }
 
-            return result;
+            readableSolution = result.ToArray();
+
+            return this;
         }
 
         [Time("Generating negative points from cluster's points distribution")]
