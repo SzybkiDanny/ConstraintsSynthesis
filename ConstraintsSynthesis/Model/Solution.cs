@@ -166,9 +166,9 @@ namespace ConstraintsSynthesis.Model
         }
 
         [Time("Generating negative points from cluster's points distribution")]
-        public Solution GenerateNegativePointsFromClusterDistribution(double probability = 0.001, int count = 1000)
+        public Solution GenerateNegativePointsFromClusterDistribution(double quantile = 0.999, int count = 1000)
         {
-            var negativePoints = Cluster.GenerateNegativePointsFromPositivesDistribution(probability, count);
+            var negativePoints = Cluster.GenerateNegativePointsFromPositivesDistribution(quantile, count);
 
             Cluster.Points.AddRange(negativePoints);
             

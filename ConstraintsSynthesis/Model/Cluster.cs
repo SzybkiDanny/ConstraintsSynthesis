@@ -99,7 +99,7 @@ namespace ConstraintsSynthesis.Model
         public double BIC =>
             -2*LogLikelihood + K*Math.Log(Size);
 
-        public IEnumerable<Point> GenerateNegativePointsFromPositivesDistribution(double probability, int count = 100)
+        public IEnumerable<Point> GenerateNegativePointsFromPositivesDistribution(double quantile, int count = 100)
         {
             for (var i = 0; i < count; i++)
             {
@@ -108,13 +108,13 @@ namespace ConstraintsSynthesis.Model
                 do
                 {
                     point = _multivariateNormalDistribution.Generate();
-                } while (_multivariateNormalDistribution.Mahalanobis(point) < CalculateThreshold(probability));
+                } while (_multivariateNormalDistribution.Mahalanobis(point) < CalculateThreshold(quantile));
 
                 yield return new Point(point) {Label = false};
             }
         }
 
-        private double CalculateThreshold(double probability) =>
-            Math.Sqrt(ChiSquareDistribution.Inverse(1 - probability, Dimensions));
+        private double CalculateThreshold(double quantile) =>
+            Math.Sqrt(ChiSquareDistribution.Inverse(quantile, Dimensions));
     }
 }
