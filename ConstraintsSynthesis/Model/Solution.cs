@@ -156,7 +156,7 @@ namespace ConstraintsSynthesis.Model
         {
             var result = new List<string>();
 
-            foreach (var constraint in Constraints)
+            foreach (var constraint in Constraints.Where(c => !c.IsMarkedRedundant))
             {
                 constraint.ConvertToLessThanOrEqual();
                 result.Add($"{constraint} + (1 - b{Index}) * M");
