@@ -19,11 +19,12 @@ namespace ConstraintsSynthesis.Model
             _constraints.Select(c => c.Translate(Cluster.Means));
         public IEnumerable<LinearConstraint> InitialConstraints =>
             _initialConstraints.Select(c => c.Translate(Cluster.Means));
-        public int Index { get; set; }
+        public int Index { get; }
 
-        public Solution(Cluster cluster)
+        public Solution(Cluster cluster, int index = 0)
         {
             Cluster = cluster;
+            Index = index;
         }
 
         [Time("Generating initial constraints")]

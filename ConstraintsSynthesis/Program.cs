@@ -79,7 +79,7 @@ namespace ConstraintsSynthesis
 
                     startTime = DateTime.Now;
                     var clusters = xmeans.Clusters;
-                    var solutions = clusters.Select(c => new Solution(c)).ToArray();
+                    var solutions = clusters.Select((c, i) => new Solution(c, i)).ToArray();
 
                     List<string> model = new List<string>();
 
