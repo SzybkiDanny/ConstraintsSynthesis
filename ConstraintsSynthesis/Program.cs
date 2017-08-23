@@ -77,6 +77,8 @@ namespace ConstraintsSynthesis
                     var endTime = DateTime.Now;
                     experiment["clusteringDuration"] = endTime - startTime;
 
+                    experiment["clusters"] = xmeans.Clusters.Count;
+
                     startTime = DateTime.Now;
                     var clusters = xmeans.Clusters;
                     var solutions = clusters.Select((c, i) => new Solution(c, i)).ToArray();
