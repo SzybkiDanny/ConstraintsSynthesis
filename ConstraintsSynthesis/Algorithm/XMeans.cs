@@ -63,7 +63,7 @@ namespace ConstraintsSynthesis.Algorithm
         private static IList<Cluster> SplitPointsIntoClusters(IList<Point> points, int clustersCount, bool normalize)
         {
             var observations = points.Select(p => p.Coordinates).ToArray();
-            var kmeans = new KMeans(clustersCount);
+            var kmeans = new KMeans(clustersCount) {ParallelOptions = {MaxDegreeOfParallelism = 1}};
 
             if (normalize)
             {
