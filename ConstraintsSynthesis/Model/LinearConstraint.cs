@@ -9,7 +9,7 @@ namespace ConstraintsSynthesis.Model
         {
             for (var i = 0; i < coefficients.Length; i++)
             {
-                Terms[new Term() { [i] = 1.0 }] = coefficients[i];
+                Terms[new Term(i)] = coefficients[i];
             }
 
             AbsoluteTerm = absoluteTerm;
@@ -19,7 +19,7 @@ namespace ConstraintsSynthesis.Model
         {
             for (var i = 0; i < dimensions; i++)
             {
-                Terms[new Term() {[i] = 1.0}] = coefficients.Keys.Contains(i)
+                Terms[new Term(i)] = coefficients.Keys.Contains(i)
                     ? coefficients[i]
                     : 0;
             }
@@ -43,10 +43,10 @@ namespace ConstraintsSynthesis.Model
         {
             get
             {
-                var term = new Term() {[index] = 1.0};
+                var term = new Term(index);
                 return Terms.ContainsKey(term) ? Terms[term] : 0;
             }
-            set { Terms[new Term() { [index] = 1.0 }] = value; }
+            set { Terms[new Term(index)] = value; }
         }
 
         public override object Clone()

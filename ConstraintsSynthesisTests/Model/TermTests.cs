@@ -53,9 +53,7 @@ namespace ConstraintsSynthesisTests.Model
         [TestCaseSource(nameof(ToStringTestCases))]
         public void ToStringTest(Dictionary<int, double> variables, string expected)
         {
-            foreach (var entry in variables)
-                _term[entry.Key] = entry.Value;
-
+            _term = new Term(variables);
 
             Assert.AreEqual(expected, _term.ToString());
         }
@@ -64,8 +62,7 @@ namespace ConstraintsSynthesisTests.Model
         [TestCaseSource(nameof(ValueInInvalidPointTestCases))]
         public void ValueInInvalidPointTest(Dictionary<int, double> variables, Point point)
         {
-            foreach (var entry in variables)
-                _term[entry.Key] = entry.Value;
+            _term = new Term(variables);
 
             Assert.Throws(typeof(IndexOutOfRangeException), () => _term.Value(point));
         }
@@ -74,8 +71,7 @@ namespace ConstraintsSynthesisTests.Model
         [TestCaseSource(nameof(ValueInValidPointTestCases))]
         public void ValueInValidPointTest(Dictionary<int, double> variables, Point point, double expectedValue)
         {
-            foreach (var entry in variables)
-                _term[entry.Key] = entry.Value;
+            _term = new Term(variables);
 
             var actualValue = _term.Value(point);
 
