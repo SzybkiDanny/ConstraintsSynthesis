@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using ConstraintsSynthesis.Model;
-using MathNet.Numerics.Interpolation;
 using MathNet.Numerics.Random;
 using MethodTimer;
 
@@ -10,14 +9,17 @@ namespace ConstraintsSynthesis.Algorithm
 {
     public class ConstraintLocalOptimization
     {
+        private const int ProbingCoefficient = 10000;
         private static readonly MersenneTwister Random = new MersenneTwister(Program.Seed);
         private List<Point> PositivePoints { get; }
         private List<Point> NotSatisfiedPoints =>
             PositivePoints.Where(p => !Constraint.IsSatisfying(p)).ToList();
 
+        private Dictionary<Term, ChangeDirection> _coefficientsOptimizationDirection = new Dictionary<Term, ChangeDirection>();
+        private Dictionary<Term, double> _coefficientsStepFactor = new Dictionary<Term, double>();
+
         public Constraint Constraint { get; }
         public List<Point> Points { get; }
-        public double MinimalCoefficientOptimizationStep = 0.15;
 
         public int SatisfiedPointsCount =>
             PositivePoints.Count(Constraint.IsSatisfying);
@@ -27,6 +29,7 @@ namespace ConstraintsSynthesis.Algorithm
             Constraint = constraint;
             Points = cluster.Points;
             PositivePoints = Points.Where(p => p.Label).ToList();
+            ProbeCoefficientChangeDirection();
         }
 
         [Time("Optimizing sign")]
@@ -38,58 +41,34 @@ namespace ConstraintsSynthesis.Algorithm
             return this;
         }
 
-
-        private double CalculateNewCoefficientValue(int stepSign, double step, double oldValue)
-        {
-            if (stepSign > 0)
-                return oldValue * step;
-
-            return oldValue / step;
-        }
-
         [Time("Optimizing coefficients")]
         public ConstraintLocalOptimization OptimizeCoefficients()
         {
-            var stepSign = Constraint.Sign == Inequality.GreaterThanOrEqual ? 1 : -1;
-            var signChanged = false;
-            var step = CalculateCoefficientOptimizationStep();
+            var terms = Constraint.Terms.Keys.ToList();
+            var notSatisfied = NotSatisfiedPoints.Count;
 
-            while (NotSatisfiedPoints.Count > 0)
+            while (notSatisfied > 0)
             {
-                Term selectedTerm = null;
-                var leastNotSatisfiedPoints = NotSatisfiedPoints.Count;
+                var coefficientAvg = Constraint.Terms.Values.Average(c => Math.Abs(c));
+                var step = CalculateCoefficientOptimizationStep();
 
-                foreach (var term in Constraint.Terms.Keys.ToList())
+                foreach (var term in terms)
                 {
-                    var notSatisfiedPoints = TestCoefficientChange(term, step, stepSign);
-
-                    if (notSatisfiedPoints >= leastNotSatisfiedPoints)
-                        continue;
-
-                    selectedTerm = term;
-                    leastNotSatisfiedPoints = notSatisfiedPoints;
+                    Constraint[term] = CalculateNewCoefficientValue((int)_coefficientsOptimizationDirection[term],
+                        _coefficientsStepFactor[term] * Math.Abs(Constraint[term]) / coefficientAvg, Constraint[term]);
                 }
 
-                if (selectedTerm != null)
-                {
-                    Constraint[selectedTerm] = CalculateNewCoefficientValue(stepSign, step, Constraint[selectedTerm]);
-                    signChanged = false;
-                }
-                else if (NotSatisfiedPoints.Count > 0 && !signChanged)
-                {
-                    stepSign *= -1;
-                    signChanged = true;
-                }
-                else if (NotSatisfiedPoints.Count > 0 && signChanged)
-                {
-                    Constraint.AbsoluteTerm += step * (Constraint.Sign == Inequality.GreaterThanOrEqual ? -1 : 1);
-                    signChanged = false;
-                }
-                else
-                {
-                    step *= 2;
-                    signChanged = false;
-                }
+                Constraint.AbsoluteTerm += step * coefficientAvg * (Constraint.Sign == Inequality.GreaterThanOrEqual ? -1 : 1);
+                ProbeCoefficientChangeDirection(step);
+                notSatisfied = NotSatisfiedPoints.Count;
+
+                var notSatisfiedAfterChange = NotSatisfiedPoints.Count;
+
+                if (notSatisfiedAfterChange == 0)
+                    return this;
+
+                if (notSatisfiedAfterChange < notSatisfied)
+                    notSatisfied = notSatisfiedAfterChange;
             }
 
             return this;
@@ -108,11 +87,11 @@ namespace ConstraintsSynthesis.Algorithm
                 var selectedIndex = Random.Next(termsToSqueeze.Count);
                 var selectedTerm = termsToSqueeze[selectedIndex];
                 var testResult = TestCoefficientChange(selectedTerm,
-                    MinimalCoefficientOptimizationStep, stepSign);
+                    1, stepSign);
 
                 if (testResult == 0)
                 {
-                    Constraint[selectedTerm] += MinimalCoefficientOptimizationStep * stepSign;
+                    Constraint[selectedTerm] += 1 * stepSign;
                 }
                 else
                 {
@@ -125,17 +104,66 @@ namespace ConstraintsSynthesis.Algorithm
 
         private int TestCoefficientChange(Term term, double step, int stepSign)
         {
-            if (term == null)
-                return NotSatisfiedPoints.Count;
-
+            var oldValue = Constraint[term];
             Constraint[term] = CalculateNewCoefficientValue(stepSign, step, Constraint[term]);
             var result = NotSatisfiedPoints.Count;
-            Constraint[term] = CalculateNewCoefficientValue(-stepSign, step, Constraint[term]);
-
+            Constraint[term] = oldValue;
             return result;
         }
 
         private double CalculateCoefficientOptimizationStep() =>
-            1 + Math.Max((double)NotSatisfiedPoints.Count / PositivePoints.Count, MinimalCoefficientOptimizationStep);
+            1 + (double)NotSatisfiedPoints.Count / PositivePoints.Count;
+
+        private double CalculateNewCoefficientValue(int stepSign, double step, double oldValue)
+        {
+            if (stepSign > 0)
+                return oldValue + step;
+
+            return oldValue - step;
+        }
+
+        private void ProbeCoefficientChangeDirection(double step = ProbingCoefficient)
+        {
+            var notSatisfiedCount = NotSatisfiedPoints.Count;
+
+            foreach (var term in Constraint.Terms.Keys.ToList())
+            {
+                if (!_coefficientsOptimizationDirection.ContainsKey(term))
+                    _coefficientsOptimizationDirection[term] = ChangeDirection.Decreasing;
+
+                if (!_coefficientsStepFactor.ContainsKey(term))
+                    _coefficientsStepFactor[term] = 1.0;
+
+                var noCoefficientChange = TestCoefficientChange(term, step, (int)_coefficientsOptimizationDirection[term]);
+
+                if (noCoefficientChange < notSatisfiedCount)
+                {
+                    _coefficientsStepFactor[term] = 1 + noCoefficientChange / notSatisfiedCount;
+                    continue;
+                }
+
+                _coefficientsOptimizationDirection[term] = (ChangeDirection)((int)_coefficientsOptimizationDirection[term] * -1);
+
+                var coefficientChange = TestCoefficientChange(term, step, (int)_coefficientsOptimizationDirection[term]);
+
+                if (coefficientChange < notSatisfiedCount)
+                {
+                    _coefficientsStepFactor[term] = 1 + coefficientChange / notSatisfiedCount;
+                    continue;
+                }
+
+                if (coefficientChange > noCoefficientChange)
+                    _coefficientsOptimizationDirection[term] = (ChangeDirection)((int)_coefficientsOptimizationDirection[term] * -1);
+
+                _coefficientsStepFactor[term] = 1;
+
+            }
+        }
+
+        enum ChangeDirection
+        {
+            Decreasing = -1,
+            Increasing = 1,
+        }
     }
 }
