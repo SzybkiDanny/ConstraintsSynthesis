@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows.Forms;
 using Accord.Math.Random;
@@ -18,12 +19,16 @@ namespace ConstraintsSynthesis
     internal class Program
     {
         public static int Seed;
+        static readonly Process Process = Process.GetCurrentProcess();
 
         private static void Main(string[] args)
         {
+            Console.WriteLine($"{DateTime.Now}: {string.Join(" ", args)}");
+
             using (var database = new Database("stats.sqlite"))
             using (var experiment = database.NewExperiment())
             {
+                var programStart = GetTotalProcessTime();
                 try
                 {
                     var options = new Options();
@@ -71,15 +76,15 @@ namespace ConstraintsSynthesis
                                 options.TestPositiveSize + options.TestNegativeSize));
                     }
 
-                    var startTime = DateTime.Now;
+                    var algorithmStart = GetTotalProcessTime();
+
                     var xmeans = new XMeans(options.MinK, options.NormalizeData);
                     xmeans.Fit(trainingPoints);
-                    var endTime = DateTime.Now;
-                    experiment["clusteringDuration"] = endTime - startTime;
 
+                    var clusteringEnd = GetTotalProcessTime();
+                    experiment["clusteringDuration"] = clusteringEnd - algorithmStart;
                     experiment["clusters"] = xmeans.Clusters.Count;
 
-                    startTime = DateTime.Now;
                     var clusters = xmeans.Clusters;
                     var solutions = clusters.Select((c, i) => new Solution(c, i)).ToArray();
 
@@ -102,8 +107,9 @@ namespace ConstraintsSynthesis
                         model.AddRange(constraints);
                     }
 
-                    endTime = DateTime.Now;
-                    experiment["algorithmDuration"] = endTime - startTime;
+                    var algorithmEnd = GetTotalProcessTime();
+                    experiment["algorithmDuration"] = algorithmEnd - clusteringEnd;
+                    experiment["generatingConstraintsTotal"] = algorithmEnd - algorithmStart;
 
                     for (var i = 0; i < model.Count; i++)
                     {
@@ -111,10 +117,9 @@ namespace ConstraintsSynthesis
                         experimentConstraints["constraint"] = model[i];
                     }
 
-                    startTime = DateTime.Now;
+                    var generatingStatsStart = GetTotalProcessTime();
                     GenerateStats(testPoints, solutions, experiment);
-                    endTime = DateTime.Now;
-                    experiment["generatingStatDuration"] = endTime - startTime;
+                    experiment["generatingStatDuration"] = GetTotalProcessTime() - generatingStatsStart;
                     
                     if (!options.VisualizationCreation)
                         return;
@@ -129,6 +134,7 @@ namespace ConstraintsSynthesis
                 }
                 finally
                 {
+                    experiment["totalTime"] = GetTotalProcessTime() - programStart;
                     experiment.Save();
                 }
             }
@@ -154,6 +160,12 @@ namespace ConstraintsSynthesis
             stats["fscore"] = confusionMatrix.FScore;
             stats["precision"] = confusionMatrix.Precision;
             stats["recall"] = confusionMatrix.Recall;
+        }
+
+        public static TimeSpan GetTotalProcessTime()
+        {
+            Process.Refresh();
+            return Process.TotalProcessorTime;
         }
     }
 }
