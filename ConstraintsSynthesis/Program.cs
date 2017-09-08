@@ -60,9 +60,15 @@ namespace ConstraintsSynthesis
                         var benchmarkGenerator = Activator.CreateInstance(generatorType) as BenchmarkGenerator;
 
                         trainingPoints = benchmarkGenerator.Generate(options.Dimensions, options.d,
-                            options.TrainingDataSize);
-                        testPoints = benchmarkGenerator.Generate(options.Dimensions, options.d, options.TestPositiveSize,
-                            options.TestNegativeSize);
+                            options.TrainingDataSize, 0);
+
+                        testPoints = options.TestSize > 0
+                            ? benchmarkGenerator.Generate(options.Dimensions, options.d, options.TestSize)
+                            : benchmarkGenerator.Generate(options.Dimensions, options.d, options.TestPositiveSize,
+                                options.TestNegativeSize);
+
+                        experiment["testPointsPositive"] = testPoints.Count(p => p.Label);
+                        experiment["testPointsNegative"] = testPoints.Count(p => !p.Label);
                     }
                     else
                     {

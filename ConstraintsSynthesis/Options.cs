@@ -45,6 +45,10 @@ namespace ConstraintsSynthesis
             HelpText = "Training data set size.")]
         public int TrainingDataSize { get; set; }
 
+        [Option("testSize", DefaultValue = 0, Required = false,
+            HelpText = "Test data set size.")]
+        public int TestSize { get; set; }
+
         [Option("testPositiveSize", DefaultValue = 10000, Required = false,
             HelpText = "Positive test data set size.")]
         public int TestPositiveSize { get; set; }
