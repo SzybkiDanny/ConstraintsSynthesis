@@ -74,34 +74,6 @@ namespace ConstraintsSynthesis.Algorithm
             return this;
         }
 
-        [Time("Squeezing constraints")]
-        public ConstraintLocalOptimization SqueezeConstraint()
-        {
-            var termsToSqueeze = new List<Term>(Constraint.Terms.Keys);
-            var stepSign = Constraint.Sign == Inequality.LessThanOrEqual ? 1 : -1;
-
-            Constraint.AbsoluteTerm += 5 * stepSign;
-
-            while (termsToSqueeze.Count > 0)
-            {
-                var selectedIndex = Random.Next(termsToSqueeze.Count);
-                var selectedTerm = termsToSqueeze[selectedIndex];
-                var testResult = TestCoefficientChange(selectedTerm,
-                    1, stepSign);
-
-                if (testResult == 0)
-                {
-                    Constraint[selectedTerm] += 1 * stepSign;
-                }
-                else
-                {
-                    termsToSqueeze.RemoveAt(selectedIndex);
-                }
-            }
-
-            return this;
-        }
-
         private int TestCoefficientChange(Term term, double step, int stepSign)
         {
             var oldValue = Constraint[term];

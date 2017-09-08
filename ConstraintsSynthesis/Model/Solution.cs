@@ -38,27 +38,6 @@ namespace ConstraintsSynthesis.Model
             return this;
         }
 
-        [Time("Generating constraints based on initial constraints")]
-        public Solution GenerateImprovedInitialConstraints(int iterations = 1)
-        {
-            if (_initialConstraints == null)
-                throw new Exception("No initial constraints are generated");
-
-            for (var i = 0; i < iterations; i++)
-            {
-                foreach (var initialConstraint in _initialConstraints)
-                {
-                    var newConstraint = initialConstraint.Clone() as LinearConstraint;
-                    var optimizer = new ConstraintLocalOptimization(newConstraint, Cluster.GetCentralizedCluster());
-
-                    optimizer.SqueezeConstraint();
-                    _constraints.Add(optimizer.Constraint as LinearConstraint);
-                }
-            }
-
-            return this;
-        }
-
         [Time("Generating random constraints")]
         public Solution GenerateRandomConstraints(
             ConstraintsGeneration constraintsGeneration = ConstraintsGeneration.CrossingRandomPoint, int count = 100,
