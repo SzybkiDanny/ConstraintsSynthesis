@@ -86,13 +86,8 @@ namespace ConstraintsSynthesis.Algorithm
         private double CalculateCoefficientOptimizationStep() =>
             1 + (double)NotSatisfiedPoints.Count / PositivePoints.Count;
 
-        private double CalculateNewCoefficientValue(int stepSign, double step, double oldValue)
-        {
-            if (stepSign > 0)
-                return oldValue + step;
-
-            return oldValue - step;
-        }
+        private double CalculateNewCoefficientValue(int stepSign, double step, double oldValue) =>
+            oldValue + stepSign * step;
 
         private void ProbeCoefficientChangeDirection(double step = ProbingCoefficient)
         {
