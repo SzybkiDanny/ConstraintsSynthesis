@@ -14,12 +14,14 @@ namespace ConstraintsSynthesis.Algorithm
         public static IEnumerable<LinearConstraint> GenerateRandomLinearConstraints(Cluster cluster,
             int constraintsCount)
         {
+            const int DefaultStdDev = 30;
+
             for (var i = 0; i < constraintsCount; i++)
             {
                 var randomPointCoordinates = cluster.Points[Random.Next(cluster.Size)].Coordinates;
                 var coefficients = new double[randomPointCoordinates.Length];
 
-                Normal.Samples(Random, coefficients, 0.0, 15);
+                Normal.Samples(Random, coefficients, 0.0, DefaultStdDev);
 
                 var absoluteTerm = randomPointCoordinates.Zip(coefficients, (p, c) => p*c).Sum();
 
