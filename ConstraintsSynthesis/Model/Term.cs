@@ -9,15 +9,11 @@ namespace ConstraintsSynthesis.Model
         private readonly string _termString;
         private readonly SortedDictionary<int, double> _variables;
 
-        public Term() : this(null)
+        public Term(int index, double value = 1.0) : this(new Dictionary<int, double> {{index, value}})
         {
         }
 
-        public Term(int index, double value = 1.0) : this(null)
-        {
-            _variables[index] = value;
-        }
-
+        
         public Term(Dictionary<int, double> variables)
         {
             _variables = new SortedDictionary<int, double>(variables ?? new Dictionary<int, double>());
@@ -25,7 +21,7 @@ namespace ConstraintsSynthesis.Model
                 _variables.Where(entry => Math.Abs(entry.Value) > double.Epsilon)
                     .Select(
                         entry =>
-                            entry.Key + (Math.Abs(entry.Value - 1.0) > double.Epsilon
+                            "x" + entry.Key + (Math.Abs(entry.Value - 1.0) > double.Epsilon
                                 ? " ^ " + entry.Value
                                 : string.Empty)));
         }

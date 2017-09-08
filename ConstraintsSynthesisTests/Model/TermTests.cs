@@ -8,12 +8,6 @@ namespace ConstraintsSynthesisTests.Model
     [TestFixture]
     public class TermTests
     {
-        [SetUp]
-        public void Init()
-        {
-            _term = new Term();
-        }
-
         private static readonly object[] ValueInValidPointTestCases =
         {
             new object[] {new Dictionary<int, double>(), new Point(new[] {1.0, 2.0}), 0.0},
