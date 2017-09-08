@@ -77,7 +77,7 @@ namespace ConstraintsSynthesis
             HelpText = "Number of random constraints to generate.")]
         public int RandomConstraintsToGenerate { get; set; }
 
-        [Option("angleSimilarity", DefaultValue = 10, Required = false,
+        [Option("angleSimilarity", DefaultValue = 5, Required = false,
             HelpText = "Maximum angle between constraints to be similar.")]
         public double AngleSimilarity { get; set; }
 
