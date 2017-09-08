@@ -9,23 +9,19 @@ namespace ConstraintsSynthesis.Benchmarks
 {
     public class BallGenerator : BenchmarkGenerator
     {
-        private ContinuousUniform _uniformDistributionForPositives;
-        private ContinuousUniform _uniformDistributionForNegatives;
-
-        public override IList<Point> Generate(int dimensions, double d, int positives, int negatives = 0)
+        public override IList<Point> Generate(int dimensions, double d, int positives, int negatives)
         {
             var result = new List<Point>(positives + negatives);
             var generatedPositives = 0;
             var generatedNegatives = 0;
-
-            _uniformDistributionForPositives = new ContinuousUniform(1 - d, d + dimensions, RandomSource);
-            _uniformDistributionForNegatives = new ContinuousUniform(1 - 2 * d, dimensions + 2 * d, RandomSource);
+            var uniformDistributionForPositives = new ContinuousUniform(1 - d, d + dimensions, RandomSource);
+            var uniformDistributionForNegatives = new ContinuousUniform(1 - 2 * d, dimensions + 2 * d, RandomSource);
 
             while (generatedPositives < positives)
             {
                 var samples = new double[dimensions];
 
-                _uniformDistributionForPositives.Samples(samples);
+                uniformDistributionForPositives.Samples(samples);
 
                 if (Distance.Euclidean(Enumerable.Range(1, dimensions).Select(Convert.ToDouble).ToArray(), samples) > d)
                     continue;
@@ -38,13 +34,33 @@ namespace ConstraintsSynthesis.Benchmarks
             {
                 var samples = new double[dimensions];
 
-                _uniformDistributionForNegatives.Samples(samples);
+                uniformDistributionForNegatives.Samples(samples);
 
                 if (Distance.Euclidean(Enumerable.Range(1, dimensions).Select(Convert.ToDouble).ToArray(), samples) <= d)
                     continue;
 
                 generatedNegatives++;
                 result.Add(new Point(samples) { Label = false });
+            }
+
+            return result;
+        }
+
+        public override IList<Point> Generate(int dimensions, double d, int total)
+        {
+            var result = new List<Point>(total);
+            var generated = 0;
+            var uniformDistribution = new ContinuousUniform(1 - 2 * d, dimensions + 2 * d, RandomSource);
+
+            while (generated++ < total)
+            {
+                var samples = new double[dimensions];
+
+                uniformDistribution.Samples(samples);
+
+                var label = Distance.Euclidean(Enumerable.Range(1, dimensions).Select(Convert.ToDouble).ToArray(), samples) <= d;
+
+                result.Add(new Point(samples) { Label = label });
             }
 
             return result;

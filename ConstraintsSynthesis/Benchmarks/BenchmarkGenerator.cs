@@ -8,6 +8,7 @@ namespace ConstraintsSynthesis.Benchmarks
     {
         protected MersenneTwister RandomSource = new MersenneTwister(Program.Seed);
 
-        public abstract IList<Point> Generate(int dimensions, double d, int positives, int negatives = 0);
+        public abstract IList<Point> Generate(int dimensions, double d, int positives, int negatives);
+        public abstract IList<Point> Generate(int dimensions, double d, int total);
     }
 }
