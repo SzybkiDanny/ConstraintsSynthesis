@@ -8,7 +8,7 @@ namespace ConstraintsSynthesis.Benchmarks
 {
     public class SimplexGenerator : BenchmarkGenerator
     {
-        public override IList<Point> Generate(int dimensions, double d, int positives, int negatives)
+        public override IList<Point> Generate(int dimensions, double d, int k, int positives, int negatives)
         {
             var result = new List<Point>(positives + negatives);
             var generatedPositives = 0;
@@ -62,7 +62,7 @@ namespace ConstraintsSynthesis.Benchmarks
             return result;
         }
 
-        public override IList<Point> Generate(int dimensions, double d, int total)
+        public override IList<Point> Generate(int dimensions, double d, int k, int total)
         {
             var result = new List<Point>(total);
             var generated = 0;
@@ -76,20 +76,19 @@ namespace ConstraintsSynthesis.Benchmarks
                 uniformDistribution.Samples(samples);
 
                 if (samples.Sum() > d)
-                    continue;
-
-                for (var i = 1; i <= dimensions; i++)
-                {
-                    for (var j = i + 1; j < dimensions; j++)
+                    isPositive = false;
+                else
+                    for (var i = 1; i <= dimensions; i++)
                     {
-                        if (samples[i - 1] / Math.Tan(Math.PI / 12) - samples[j - 1] * Math.Tan(Math.PI / 12) < 0 ||
-                            samples[j - 1] / Math.Tan(Math.PI / 12) - samples[i - 1] * Math.Tan(Math.PI / 12) < 0)
+                        for (var j = i + 1; j < dimensions; j++)
                         {
-                            isPositive = false;
-                            break;
+                            if (samples[i - 1] / Math.Tan(Math.PI / 12) - samples[j - 1] * Math.Tan(Math.PI / 12) < 0 ||
+                                samples[j - 1] / Math.Tan(Math.PI / 12) - samples[i - 1] * Math.Tan(Math.PI / 12) < 0)
+                            {
+                                isPositive = false;
+                            }
                         }
                     }
-                }
 
                 result.Add(new Point(samples) { Label = isPositive });
             }

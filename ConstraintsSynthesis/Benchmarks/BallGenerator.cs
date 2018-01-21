@@ -9,7 +9,7 @@ namespace ConstraintsSynthesis.Benchmarks
 {
     public class BallGenerator : BenchmarkGenerator
     {
-        public override IList<Point> Generate(int dimensions, double d, int positives, int negatives)
+        public override IList<Point> Generate(int dimensions, double d, int k, int positives, int negatives)
         {
             var result = new List<Point>(positives + negatives);
             var generatedPositives = 0;
@@ -46,7 +46,7 @@ namespace ConstraintsSynthesis.Benchmarks
             return result;
         }
 
-        public override IList<Point> Generate(int dimensions, double d, int total)
+        public override IList<Point> Generate(int dimensions, double d, int k, int total)
         {
             var result = new List<Point>(total);
             var generated = 0;
