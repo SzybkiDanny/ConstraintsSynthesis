@@ -7,7 +7,7 @@ namespace ConstraintsSynthesis
     public static class MethodTimeLogger
     {
         public static TimeLogLevel LogLevel = TimeLogLevel.General;
-        public static Action<string> LogAction = Console.WriteLine; 
+        public static Action<string> LogAction = s => Debug.WriteLine(s); 
 
         static MethodTimeLogger()
         {
