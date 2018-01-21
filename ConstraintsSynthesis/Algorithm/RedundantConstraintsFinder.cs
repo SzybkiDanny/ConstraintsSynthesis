@@ -33,6 +33,9 @@ namespace ConstraintsSynthesis.Algorithm
 
                 foreach (var secondConstraintIndex in firstConstraint.Value)
                 {
+                    if (secondConstraintIndex > firstConstraint.Key)
+                        continue;
+
                     var distance = constraintUtilityMetric(constraints[secondConstraintIndex]);
 
                     if (distance < distanctFromBest)
@@ -75,7 +78,7 @@ namespace ConstraintsSynthesis.Algorithm
 
                     cosinus = cosinus > 1 ? 1 : cosinus < -1 ? -1 : cosinus;
 
-                    var angle = Math.Acos(cosinus) * 180 / Math.PI;
+                    var angle = Math.Abs(Math.Acos(cosinus) * 180 / Math.PI);
 
                     if (angle <= angleSimilarityMarigin)
                         similarConstraints[i].Add(j);
