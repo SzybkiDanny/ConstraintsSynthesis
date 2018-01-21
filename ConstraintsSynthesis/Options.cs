@@ -25,9 +25,11 @@ namespace ConstraintsSynthesis
             HelpText = "Seed for all random operations.")]
         public TimeLogLevel LogLevel { get; set; }
 
-        [Option("visualizationCreation", DefaultValue = false, Required = false,
+        [Option("visualizationCreation", DefaultValue = Boolean.False, Required = false,
             HelpText = "Creating solution visualization.")]
-        public bool VisualizationCreation { get; set; }
+        public Boolean _visualizationCreation { private get; set; }
+
+        public bool VisualizationCreation => _visualizationCreation.Equals(Boolean.True);
 
         [Option("benchmark", DefaultValue = "Simplex", Required = false,
             HelpText = "Benchmark type to be used.")]
@@ -40,6 +42,10 @@ namespace ConstraintsSynthesis
         [Option("d", DefaultValue = 2.7, Required = false,
             HelpText = "d constant for benchmark generation.")]
         public double d { get; set; }
+
+        [Option("k", DefaultValue = 1, Required = false,
+            HelpText = "k constant for benchmark generation.")]
+        public int k { get; set; }
 
         [Option("trainingSize", DefaultValue = 1000, Required = false,
             HelpText = "Training data set size.")]
@@ -57,25 +63,37 @@ namespace ConstraintsSynthesis
             HelpText = "Negative test data set size.")]
         public int TestNegativeSize { get; set; }
 
+        [Option("enforceSingleCluster", DefaultValue = Boolean.False, Required = false,
+            HelpText = "Enforce not using clustering.")]
+        public Boolean _enforceSingleCluster { private get; set; }
+
+        public bool EnforceSingleCluster => _enforceSingleCluster.Equals(Boolean.True);
+
         [Option("minClusters", DefaultValue = 1, Required = false,
             HelpText = "Minimum number of result clusters.")]
         public int MinK { get; set; }
 
-        [Option("normalizeData", DefaultValue = true, Required = false,
+        [Option("normalizeData", DefaultValue = Boolean.True, Required = false,
             HelpText = "Normalizing data before clustering.")]
-        public bool NormalizeData { get; set; }
+        public Boolean _normalizeData { private get; set; }
+
+        public bool NormalizeData => _normalizeData.Equals(Boolean.True);
 
         [Option("constraintsGeneration", DefaultValue = ConstraintsGeneration.CrossingRandomPoint, Required = false,
             HelpText = "Constraints generation algorithm type.")]
         public ConstraintsGeneration ConstraintsGeneration { get; set; }
 
-        [Option("optimizeSign", DefaultValue = true, Required = false,
+        [Option("optimizeSign", DefaultValue = Boolean.True, Required = false,
             HelpText = "Sign optimization.")]
-        public bool OptimizeSign { get; set; }
+        public Boolean _optimizeSign { private get; set; }
 
-        [Option("optimizeCoefficients", DefaultValue = true, Required = false,
+        public bool OptimizeSign => _optimizeSign.Equals(Boolean.True);
+
+        [Option("optimizeCoefficients", DefaultValue = Boolean.True, Required = false,
             HelpText = "Coefficients optimization.")]
-        public bool OptimizeCoefficeints { get; set; }
+        public Boolean _optimizeCoefficients { private get; set; }
+
+        public bool OptimizeCoefficients => _optimizeCoefficients.Equals(Boolean.True);
 
         [Option("randomConstraintsToGenerate", DefaultValue = 100, Required = false,
             HelpText = "Number of random constraints to generate.")]
@@ -104,5 +122,11 @@ namespace ConstraintsSynthesis
         [HelpOption]
         public string GetUsage() => HelpText.AutoBuild(this,
             current => HelpText.DefaultParsingErrorsHandler(this, current));
+
+        public enum Boolean
+        {
+            False,
+            True
+        }
     }
 }
