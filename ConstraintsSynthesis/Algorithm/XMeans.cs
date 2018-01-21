@@ -15,20 +15,25 @@ namespace ConstraintsSynthesis.Algorithm
         private static readonly Normalization Normalization = new Normalization();
         public int MinK { get; }
         public bool Normalize { get; }
+        public bool EnforceSingleCluster { get; }
         public IList<Cluster> Clusters { get; } = new List<Cluster>();
 
-        public XMeans(int minK = 1, bool normalize = true)
-        {
+        public XMeans(int minK = 1, bool normalize = true, bool enforceSingleCluster = false)
+        {   
             MinK = minK;
             Normalize = normalize;
+            EnforceSingleCluster = enforceSingleCluster;
         }
 
         [Time("Clustering points")]
         public void Fit(IList<Point> points)
         {
-            var clusters = SplitPointsIntoClusters(points, MinK, Normalize);
+            var clusters = SplitPointsIntoClusters(points, EnforceSingleCluster ? 1 : MinK, Normalize);
 
-            RecursivelySplit(clusters);
+            if (!EnforceSingleCluster)
+                RecursivelySplit(clusters);
+            else
+                Clusters.Add(clusters.First());
         }
 
         private void RecursivelySplit(IEnumerable<Cluster> clusters)
